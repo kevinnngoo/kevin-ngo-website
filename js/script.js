@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       {
         title: "Conway's Game of Life",
-        description: 'Terminal‑based simulation of Conway\'s Game of Life, modeling cellular automata through evolving patterns.',
+        description: "A terminal-based implementation of Conway’s Game of Life written in Python. This project simulates the evolution of cellular patterns using simple rules, random starting states, and an animated display in the terminal. Built as a beginner-friendly project to practice loops, conditionals, and 2D list manipulation for hands-on learning.",
         language: 'Python',
         stars: 0,
         url: 'https://github.com/kevinnngoo/conways_game_of_life',
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       {
         title: 'Microblog',
-        description: 'Full‑featured Flask microblog platform featuring user authentication, profiles, following system, blogging, private messaging, search, translation, notifications, background jobs, REST API and internationalization. Built with Flask, SQLAlchemy, Bootstrap and more.',
+    description: 'Full‑featured Flask microblog platform featuring user authentication, profiles, following system, blogging, private messaging, search, translation, notifications, background jobs, REST API and internationalization. Built with Flask, SQLAlchemy, Bootstrap and more.',
         language: 'Python',
         stars: 0,
         url: 'https://github.com/kevinnngoo/microblog',
@@ -249,11 +249,15 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (name.includes('microblog')) image = './images/projects/microblog.png';
             else if (name.includes('stock')) image = './images/projects/stock_market_predictor.png';
             else image = './images/projects/expense_tracker.png';
-            // Provide custom descriptions if GitHub description is missing
+            // Always use custom description for Microblog and Conway's Game of Life
             let description = repo.description || '';
-            if (!description && name.includes('microblog')) {
+            if (name.includes('microblog')) {
               description =
-                'Full‑featured Flask microblog platform featuring user authentication, profiles, following system, blogging, messaging, search, translation, notifications and more.';
+                'Full‑featured Flask microblog platform featuring user authentication, profiles, following system, blogging, private messaging, search, translation, notifications, background jobs, REST API and internationalization. Built with Flask, SQLAlchemy, Bootstrap and more.';
+            }
+            if (name.includes('conway')) {
+              description =
+                "A terminal-based implementation of Conway’s Game of Life written in Python. This project simulates the evolution of cellular patterns using simple rules, random starting states, and an animated display in the terminal. Built as a beginner-friendly project to practice loops, conditionals, and 2D list manipulation for hands-on learning.";
             }
             if (!description && name.includes('stock')) {
               description =
