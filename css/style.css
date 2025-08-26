@@ -109,12 +109,14 @@ a:focus {
   padding: 0.4rem 0.8rem;
   border: 1px solid var(--accent);
   border-radius: 4px;
-  color: var(--accent);
+  background-color: var(--accent);
+  color: #fff;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .header__links li.resume-link a:hover {
-  background-color: var(--accent);
-  color: #ffffff;
+  background-color: #01201A;
+  color: #fff;
 }
 
 /* underline effect */
@@ -532,11 +534,29 @@ h2::after {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  position: relative;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .contact__submit:hover {
-  background-color: var(--accent-light);
+  background-color: #01201A;
+  color: #fff;
+  border: 1px solid var(--accent);
+}
+
+.contact__submit::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.contact__submit:hover::after {
+  width: 100%;
 }
 
 .contact__status {
@@ -821,23 +841,11 @@ h2::after {
 
 /* Directional pointers connecting card to vertical line */
 .timeline-item.left .timeline-card::after {
-  content: '';
-  position: absolute;
-  top: 24px;
-  right: -12px;
-  border-left: 12px solid #ffffff;
-  border-top: 12px solid transparent;
-  border-bottom: 12px solid transparent;
+  /* Removed arrow pseudo-element */
 }
 
 .timeline-item.right .timeline-card::after {
-  content: '';
-  position: absolute;
-  top: 24px;
-  left: -12px;
-  border-right: 12px solid #ffffff;
-  border-top: 12px solid transparent;
-  border-bottom: 12px solid transparent;
+  /* Removed arrow pseudo-element */
 }
 
 .timeline-card h3 {
