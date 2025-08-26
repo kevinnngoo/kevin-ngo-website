@@ -1,3 +1,8 @@
+/* Specific color for Sight Studio LLC heading */
+.timeline-card h4:contains('Sight Studio LLC'),
+.timeline-card h4.sight-studio {
+  color: #16764C !important;
+}
 /*
   Kevin Ngo Portfolio Stylesheet
   A modern dark‑themed layout with forest green accents. The design adapts
@@ -274,7 +279,7 @@ a:focus {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: calc(100vh - var(--nav-height));
+  min-height: 40vh;
   margin-top: var(--nav-height);
   overflow: hidden;
 }
@@ -283,8 +288,9 @@ a:focus {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  transform: none;
   object-fit: cover;
   opacity: 0.4;
   pointer-events: none;
@@ -296,7 +302,7 @@ a:focus {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 0.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -350,8 +356,8 @@ a:focus {
 }
 
 .hero__image img {
-  width: 280px;
-  height: 280px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid var(--accent);
