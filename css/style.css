@@ -878,3 +878,44 @@ h2::after {
 .experience {
   overflow: hidden;
 }
+
+/* Project card SVG icon styling (matches Expertise look) */
+.project-card__icon {
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.project-card__icon svg {
+  width: 40px;
+  height: 40px;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  transition: transform 0.2s ease;
+}
+
+.project-card:hover .project-card__icon svg {
+  transform: scale(1.1);
+}
+
+/* Optional soft circular badge behind icon */
+.project-card__icon--badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: rgba(0,255,140,0.08);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 0 0 1px rgba(0,255,140,0.15) inset;
+  /* Add space for tech badges */
+  position: relative;
+}
+
+.tech-list {
+  margin-bottom: 0.75rem;
+}

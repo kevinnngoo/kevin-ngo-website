@@ -3,6 +3,74 @@
 // contact form submission via mailto link. All external calls are made from
 // client‑side JavaScript.
 
+function getProjectIconSVG(repoName) {
+  const name = (repoName || "").toLowerCase();
+
+  // Microblog (Flask app): chat bubbles
+  if (name.includes("microblog")) {
+    return `
+      <svg viewBox="0 0 24 24" role="img" aria-label="Chat icon" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 5h16a2 2 0 012 2v6a2 2 0 01-2 2H9l-5 4V7a2 2 0 012-2z"/>
+        <path d="M8 10h8M8 13h5"/>
+      </svg>
+    `;
+  }
+
+  // Stock Market Predictor: line chart
+  if (name.includes("stock") || name.includes("predictor")) {
+    return `
+      <svg viewBox="0 0 24 24" role="img" aria-label="Chart icon" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 3v18h18"/>
+        <path d="M6 15l4-4 3 3 5-6"/>
+        <circle cx="10" cy="11" r="0.8" fill="currentColor"/>
+        <circle cx="13" cy="14" r="0.8" fill="currentColor"/>
+        <circle cx="18" cy="8" r="0.8" fill="currentColor"/>
+      </svg>
+    `;
+  }
+
+  // Fake News Detector: shield/check
+  if (name.includes("fake") || name.includes("news")) {
+    return `
+      <svg viewBox="0 0 24 24" role="img" aria-label="Shield icon" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 3l7 3v6c0 5-3.5 7.8-7 9-3.5-1.2-7-4-7-9V6l7-3z"/>
+        <path d="M8.5 12.5l2.5 2.5 4.5-4.5"/>
+      </svg>
+    `;
+  }
+
+  // Apartment Hunting Bot: home + search/gear hints
+  if (name.includes("apartment") || name.includes("housing") || name.includes("rent")) {
+    return `
+      <svg viewBox="0 0 24 24" role="img" aria-label="Home icon" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9z"/>
+        <path d="M16.5 8.5l1 1M14 9l.5 1.5M19 9l-.5 1.5M16.5 12.5l1-1"/>
+      </svg>
+    `;
+  }
+
+  // Conway's Game of Life: grid + filled cell
+  if (name.includes("conway") || name.includes("life")) {
+    return `
+      <svg viewBox="0 0 24 24" role="img" aria-label="Grid icon" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 3h18v18H3z"/>
+        <path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
+        <rect x="9" y="9" width="6" height="6" fill="currentColor"/>
+      </svg>
+    `;
+  }
+
+  // Default: code / chevrons
+  return `
+    <svg viewBox="0 0 24 24" role="img" aria-label="Code icon" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 16l-4-4 4-4M16 8l4 4-4 4M10 20l4-16"/>
+    </svg>
+  `;
+}
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
   // Mobile menu toggle
   const openMenuBtn = document.getElementById('openMenu');
@@ -33,57 +101,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const fallbackProjects = [
       {
         title: 'Fake News Detector',
-        description:
-          'Machine learning project that classifies news articles as REAL or FAKE using natural language processing and a PassiveAggressiveClassifier.',
+        description: 'Machine learning project that classifies news articles as REAL or FAKE using natural language processing and a PassiveAggressiveClassifier.',
         language: 'Python',
         stars: 0,
         url: 'https://github.com/kevinnngoo/ai_fake_news_detector',
-        image: './images/projects/fake_news.png'
+        tech: ['Python', 'scikit-learn', 'NLP'],
+        demo: ''
       },
       {
         title: 'Apartment Hunting Bot',
-        description:
-          'Python bot that scrapes Boston apartment listings, filters by rent and number of bedrooms, and sends daily email alerts with matching results.',
+        description: 'Python bot that scrapes Boston apartment listings, filters by rent and number of bedrooms, and sends daily email alerts with matching results.',
         language: 'Python',
         stars: 0,
         url: 'https://github.com/kevinnngoo/apartment_hunting_bot',
-        image: './images/projects/apartment_bot.png'
+        tech: ['Python', 'BeautifulSoup', 'Email'],
+        demo: ''
       },
       {
         title: 'Expense Tracker Application',
-        description:
-          'Full‑stack web application built with the MERN stack for tracking, categorizing and visualizing personal expenses in real time.',
+        description: 'Full‑stack web application built with the MERN stack for tracking, categorizing and visualizing personal expenses in real time.',
         language: 'JavaScript',
         stars: 0,
         url: 'https://github.com/kevinnngoo',
-        image: './images/projects/expense_tracker.png'
+        tech: ['MongoDB', 'Express', 'React', 'Node.js'],
+        demo: ''
       },
       {
         title: "Conway's Game of Life",
-        description:
-          'Terminal‑based simulation of Conway\'s Game of Life, modeling cellular automata through evolving patterns.',
+        description: 'Terminal‑based simulation of Conway\'s Game of Life, modeling cellular automata through evolving patterns.',
         language: 'Python',
         stars: 0,
         url: 'https://github.com/kevinnngoo/conways_game_of_life',
-        image: './images/projects/game_of_life.png'
+        tech: ['Python', 'Terminal'],
+        demo: ''
       },
       {
         title: 'Microblog',
-        description:
-          'Full‑featured Flask microblog platform featuring user authentication, profiles, following system, blogging, private messaging, search, translation, notifications, background jobs, REST API and internationalization. Built with Flask, SQLAlchemy, Bootstrap and more.',
+        description: 'Full‑featured Flask microblog platform featuring user authentication, profiles, following system, blogging, private messaging, search, translation, notifications, background jobs, REST API and internationalization. Built with Flask, SQLAlchemy, Bootstrap and more.',
         language: 'Python',
         stars: 0,
         url: 'https://github.com/kevinnngoo/microblog',
-        image: './images/projects/microblog.png'
+        tech: ['Python', 'Flask', 'SQLAlchemy', 'Bootstrap'],
+        demo: 'https://microblog-demo.netlify.app'
       },
       {
         title: 'Stock Market Predictor',
-        description:
-          'Machine learning model that predicts stock market trends using historical price data and technical indicators.',
+        description: 'Machine learning model that predicts stock market trends using historical price data and technical indicators.',
         language: 'Python',
         stars: 0,
         url: 'https://github.com/kevinnngoo/stock-market-predictor',
-        image: './images/projects/stock_market_predictor.png'
+        tech: ['Python', 'scikit-learn', 'Pandas', 'Matplotlib'],
+        demo: ''
       }
     ];
 
@@ -93,16 +161,38 @@ document.addEventListener('DOMContentLoaded', () => {
       list.forEach((proj) => {
         const card = document.createElement('div');
         card.className = 'project-card';
+
+        const iconSVG = getProjectIconSVG(proj.title || proj.name);
+
         const language = proj.language ? ` • ${proj.language}` : '';
+        const stars = typeof proj.stars === 'number' ? proj.stars : 0;
+
+        // Tech badges
+        let techBadges = '';
+        if (proj.tech && proj.tech.length) {
+          techBadges = `<div class="tech-list">${proj.tech.map(t => `<span>${t}</span>`).join('')}</div>`;
+        }
+
+        // Live demo button
+        let demoBtn = '';
+        if (proj.demo && proj.demo.startsWith('http')) {
+          demoBtn = `<a href="${proj.demo}" class="project-link" target="_blank" rel="noopener" style="margin-right:1rem;">Live Demo</a>`;
+        }
+
         card.innerHTML = `
-          <div class="project-image-wrapper">
-            <img src="${proj.image || ''}" alt="${proj.title} screenshot" class="project-image" />
+          <div class="project-card__icon project-card__icon--badge">
+            ${iconSVG}
           </div>
           <h3>${proj.title}</h3>
           <p>${proj.description}</p>
-          <div class="project-meta">${proj.stars} ★${language}</div>
-          <a href="${proj.url}" class="project-link" target="_blank" rel="noopener">View on GitHub</a>
+          ${techBadges}
+          <div class="project-meta">${stars} ★${language}</div>
+          <div style="display:flex;gap:0.5rem;">
+            ${demoBtn}
+            <a href="${proj.url}" class="project-link" target="_blank" rel="noopener">View on GitHub</a>
+          </div>
         `;
+
         projectsGrid.appendChild(card);
       });
     }
@@ -182,13 +272,12 @@ document.addEventListener('DOMContentLoaded', () => {
               .replace(/[-_]/g, ' ')
               .replace(/\b\w/g, (c) => c.toUpperCase());
             return {
-              title: formattedTitle,
-              description: description || 'No description provided.',
-              language: repo.language || '',
-              stars: repo.stargazers_count || 0,
-              url: repo.html_url,
-              image
-            };
+  title: formattedTitle,
+  description: description || 'No description provided.',
+  language: repo.language || '',
+  stars: repo.stargazers_count || 0,
+  url: repo.html_url
+};
           });
           // If there are fewer than five entries, fill from fallbackProjects
           if (selected.length < 5) {
