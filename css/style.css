@@ -293,7 +293,7 @@ a:focus {
 .hero__text h1 {
   font-size: 2.75rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: -0.4rem;
 }
 
 .hero__text p {
@@ -610,27 +610,34 @@ h2::after {
     text-align: center;
   }
   .hero__text {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem; /* Reduced margin to bring image closer */
     font-size: 1.1rem;
+    order: 1; /* Title and tagline first */
+  }
+  .hero__image {
+    order: 2; /* Image second */
+    margin-bottom: 1.5rem; /* Space between image and icons */
   }
   .hero__icons {
+    order: 3; /* Icons last */
     justify-content: center;
     gap: 1.25rem;
+    margin-top: 0; /* Remove any inherited margin */
   }
   .hero__text h1 {
     font-size: 2rem;
   }
   .hero__text p {
     font-size: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0; /* Remove margin since icons are now separate */
   }
   .hero__icons a {
     width: 38px;
     height: 38px;
   }
   .hero__image img {
-    width: 100px;
-    height: 100px;
+    width: 120px; /* Slightly larger for better mobile viewing */
+    height: 120px;
   }
   .projects__grid,
   .expertise__cards {
@@ -671,9 +678,13 @@ h2::after {
     transform: translateX(-50%);
   }
   
-  /* Center contact form button on mobile */
+  /* Center contact form button and paragraph on mobile */
   .contact__submit {
     align-self: center;
+  }
+  
+  .contact p {
+    text-align: center;
   }
   
   /* Center all section icons on mobile */
@@ -686,6 +697,45 @@ h2::after {
   }
   
   .project-card__icon {
+    align-self: center;
+  }
+  
+  /* Center all card headers and content on mobile */
+  .expertise-card h3,
+  .project-card h3,
+  .timeline-card h3,
+  .timeline-card h4,
+  .education__content h3,
+  .education__content h4 {
+    text-align: center;
+  }
+  
+  /* Center all card paragraph text on mobile */
+  .expertise-card p,
+  .project-card p,
+  .timeline-card p,
+  .education__content p {
+    text-align: center;
+  }
+  
+  /* Center tech lists on mobile */
+  .tech-list {
+    justify-content: center;
+  }
+  
+  /* Center project metadata and links */
+  .project-meta,
+  .project-link,
+  .education__meta {
+    text-align: center;
+  }
+  
+  /* Center project links container and individual links */
+  .project-card > div:last-child {
+    justify-content: center;
+  }
+  
+  .project-card a.project-link {
     align-self: center;
   }
 }
