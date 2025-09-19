@@ -653,6 +653,28 @@ h2::after {
   .header__toggle {
     display: flex;
   }
+  
+  /* Center footer content on mobile */
+  .footer__container {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  /* Center section headers on mobile */
+  h2 {
+    text-align: center;
+  }
+  
+  h2::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  /* Center contact form button on mobile */
+  .contact__submit {
+    align-self: center;
+  }
 }
 
 @media (max-width: 500px) {
