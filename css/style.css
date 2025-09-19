@@ -675,6 +675,19 @@ h2::after {
   .contact__submit {
     align-self: center;
   }
+  
+  /* Center all section icons on mobile */
+  .expertise-card__icon {
+    align-self: center;
+  }
+  
+  .education__icon {
+    align-self: center;
+  }
+  
+  .project-card__icon {
+    align-self: center;
+  }
 }
 
 @media (max-width: 500px) {
