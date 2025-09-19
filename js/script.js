@@ -304,39 +304,107 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // Contact form submission
+  // Contact form submission with enhanced validation and user experience
   const contactForm = document.getElementById('contactForm');
   const formStatus = document.getElementById('formStatus');
   if (contactForm) {
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    // Helper function to show status messages
+    function showStatus(message, isError = false) {
+      if (formStatus) {
+        formStatus.style.color = isError 
+          ? getComputedStyle(document.documentElement).getPropertyValue('--error-color')
+          : getComputedStyle(document.documentElement).getPropertyValue('--accent');
+        formStatus.textContent = message;
+        formStatus.setAttribute('aria-live', 'polite');
+      }
+    }
+    
+    // Clear status messages
+    function clearStatus() {
+      if (formStatus) {
+        formStatus.textContent = '';
+        formStatus.removeAttribute('aria-live');
+      }
+    }
+    
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      clearStatus();
+      
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const message = document.getElementById('message').value.trim();
-      if (!name || !email || !message) {
-        if (formStatus) {
-          formStatus.style.color = getComputedStyle(document.documentElement).getPropertyValue('--error-color');
-          formStatus.textContent = 'Please fill out all fields.';
-        }
+      
+      // Validate individual fields
+      if (!name) {
+        showStatus('Please enter your name.', true);
+        document.getElementById('name').focus();
         return;
       }
-      // Build mailto link
-      const subject = encodeURIComponent('Portfolio Contact Form');
+      
+      if (!email) {
+        showStatus('Please enter your email address.', true);
+        document.getElementById('email').focus();
+        return;
+      }
+      
+      if (!emailRegex.test(email)) {
+        showStatus('Please enter a valid email address.', true);
+        document.getElementById('email').focus();
+        return;
+      }
+      
+      if (!message) {
+        showStatus('Please enter your message.', true);
+        document.getElementById('message').focus();
+        return;
+      }
+      
+      if (message.length < 10) {
+        showStatus('Please enter a message with at least 10 characters.', true);
+        document.getElementById('message').focus();
+        return;
+      }
+      
+      // Build enhanced mailto link
+      const subject = encodeURIComponent(`Portfolio Contact: Message from ${name}`);
       const body = encodeURIComponent(
-        `Name: ${name}\nEmail: ${email}\n\n${message}`
+        `Hello Kevin,\n\nI'm reaching out through your portfolio contact form.\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\nBest regards,\n${name}`
       );
       const mailtoLink = `mailto:kevinngo2002@gmail.com?subject=${subject}&body=${body}`;
+      
+      // Show loading state
+      showStatus('Opening your email client...');
+      
       // Open mail client
-      window.location.href = mailtoLink;
-      if (formStatus) {
-        formStatus.style.color = getComputedStyle(document.documentElement).getPropertyValue('--accent');
-        formStatus.textContent = 'Thank you! Your email client should open shortly.';
+      try {
+        window.location.href = mailtoLink;
+        
+        // Show success message after a brief delay
+        setTimeout(() => {
+          showStatus('✓ Email client opened! If it didn\'t open automatically, please email me directly at kevinngo2002@gmail.com');
+        }, 1000);
+        
+        // Reset form after successful submission
+        setTimeout(() => {
+          contactForm.reset();
+          clearStatus();
+        }, 8000);
+        
+      } catch (error) {
+        showStatus('Unable to open email client. Please email me directly at kevinngo2002@gmail.com', true);
       }
-      // Reset form after a short delay
-      setTimeout(() => {
-        contactForm.reset();
-        if (formStatus) formStatus.textContent = '';
-      }, 3000);
+    });
+    
+    // Clear error messages when user starts typing
+    ['name', 'email', 'message'].forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.addEventListener('input', clearStatus);
+      }
     });
   }
 
