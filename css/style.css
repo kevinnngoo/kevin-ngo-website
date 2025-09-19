@@ -1,17 +1,17 @@
-/* Specific color for Sight Studio LLC heading */
-.timeline-card h4:contains('Sight Studio LLC'),
-.timeline-card h4.sight-studio {
-  color: #01201A !important;
-}
 /*
+====================================================================
   Kevin Ngo Portfolio Stylesheet
-  A modern dark‑themed layout with forest green accents. The design adapts
-  responsively for desktop and mobile devices and includes a sliding mobile
-  navigation inspired by the provided mockups. All colors are defined as
-  CSS variables for easy adjustment.
+====================================================================
+  A modern dark‑themed layout with forest green accents. The design 
+  adapts responsively for desktop and mobile devices and includes a 
+  sliding mobile navigation. All colors are defined as CSS variables 
+  for easy adjustment.
+====================================================================
 */
 
-/* Root variables */
+/* ============================================================
+   1. CSS VARIABLES & ROOT STYLES
+   ============================================================ */
 :root {
   --bg-color: #000000;      /* primary background (pure black) */
   --surface-color: #0a0d0a; /* card and section backgrounds (slightly lighter) */
@@ -26,7 +26,9 @@
   line-height: 1.6;
 }
 
-/* Global resets */
+/* ============================================================
+   2. GLOBAL RESETS & BASE STYLES
+   ============================================================ */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -59,7 +61,9 @@ a:focus {
   color: var(--accent-light);
 }
 
-/* Header navigation */
+/* ============================================================
+   3. HEADER NAVIGATION
+   ============================================================ */
 .header {
   width: 100%;
   height: var(--nav-height);
@@ -135,41 +139,6 @@ a:focus {
   width: 100%;
 }
 
-/* Search bar */
-.header__search {
-  display: flex;
-  align-items: center;
-  background-color: var(--surface-color);
-  border-radius: 20px;
-  padding: 0.3rem 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.header__search input {
-  background: transparent;
-  border: none;
-  color: var(--text-color);
-  font-size: 0.9rem;
-  outline: none;
-  width: 120px;
-}
-
-.header__search input::placeholder {
-  color: var(--muted-text);
-}
-
-.header__search button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--muted-text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin-left: 0.4rem;
-}
-
 .header__toggle {
   display: none;
   flex-direction: column;
@@ -189,7 +158,9 @@ a:focus {
   transition: all 0.3s ease;
 }
 
-/* Mobile menu */
+/* ============================================================
+   4. MOBILE NAVIGATION
+   ============================================================ */
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -233,31 +204,6 @@ a:focus {
   line-height: 1;
 }
 
-.mobile-menu__search {
-  display: flex;
-  align-items: center;
-  padding: 0.8rem 1rem;
-}
-
-.mobile-menu__search input {
-  flex: 1;
-  background: var(--bg-color);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 0.5rem 0.8rem;
-  color: var(--text-color);
-  font-size: 0.9rem;
-  outline: none;
-}
-
-.mobile-menu__search button {
-  background: none;
-  border: none;
-  color: var(--muted-text);
-  margin-left: 0.5rem;
-  cursor: pointer;
-}
-
 .mobile-menu__nav {
   flex: 1;
   overflow-y: auto;
@@ -276,7 +222,9 @@ a:focus {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Hero section */
+/* ============================================================
+   5. HERO SECTION
+   ============================================================ */
 .hero {
   position: relative;
   display: flex;
@@ -365,7 +313,9 @@ a:focus {
   border: 4px solid var(--accent);
 }
 
-/* Sections general */
+/* ============================================================
+   6. GENERAL SECTION STYLES
+   ============================================================ */
 section {
   padding: 4rem 0;
 }
@@ -398,7 +348,9 @@ h2::after {
   line-height: 1.8;
 }
 
-/* Projects */
+/* ============================================================
+   7. PROJECTS SECTION
+   ============================================================ */
 /* Subtle card hover effects for interactivity */
 .project-card:hover, .expertise-card:hover {
   box-shadow: 0 4px 24px rgba(22, 118, 76, 0.15);
@@ -483,7 +435,9 @@ h2::after {
   color: var(--accent-light);
 }
 
-/* Contact */
+/* ============================================================
+   8. CONTACT SECTION
+   ============================================================ */
 .contact p {
   margin-bottom: 1.5rem;
   color: var(--muted-text);
@@ -571,7 +525,9 @@ h2::after {
   color: #c62828;
 }
 
-/* Footer */
+/* ============================================================
+   9. FOOTER
+   ============================================================ */
 .footer {
   background-color: var(--surface-color);
   border-top: 1px solid rgba(255, 255, 255, 0.07);
@@ -612,7 +568,9 @@ h2::after {
   color: #fff;
 }
 
-/* Responsive styles */
+/* ============================================================
+   10. RESPONSIVE DESIGN
+   ============================================================ */
 @media (max-width: 900px) {
   .hero__content {
     flex-direction: column;
@@ -628,6 +586,10 @@ h2::after {
   .hero__text {
     margin-bottom: 2rem;
     font-size: 1.1rem;
+  }
+  .hero__icons {
+    justify-content: center;
+    gap: 1.25rem;
   }
   .hero__text h1 {
     font-size: 2rem;
@@ -665,9 +627,6 @@ h2::after {
   .header__toggle {
     display: flex;
   }
-  .header__search {
-    display: none;
-  }
 }
 
 @media (max-width: 500px) {
@@ -677,15 +636,41 @@ h2::after {
   .hero__text p {
     font-size: 1rem;
   }
+  
+  /* Extra small screen timeline adjustments */
+  .timeline-item {
+    padding-left: 45px;
+  }
+  
+  .timeline-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .timeline-card {
+    padding: 1rem;
+  }
+  
+  .timeline-card h3 {
+    font-size: 0.95rem;
+  }
+  
+  .timeline-card h4 {
+    font-size: 0.8rem;
+  }
+  
+  .timeline-card p {
+    font-size: 0.75rem;
+  }
 }
 
-/* ---------------------------------------------------------------------
-   Expertise Section
+/* ============================================================
+   11. EXPERTISE SECTION
+   ============================================================
    The expertise cards display areas of focus with an icon, title,
    description and a list of technologies. Cards are laid out in a
-   responsive grid and use the same dark surfaces as the rest of the
-   site. Pills highlight individual tech items with a green accent.
---------------------------------------------------------------------- */
+   responsive grid with tech pills highlighting individual items.
+   ============================================================ */
 .expertise__cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -738,14 +723,13 @@ h2::after {
   white-space: nowrap;
 }
 
-/* ---------------------------------------------------------------------
-   Experience Timeline
+/* ============================================================
+   12. EXPERIENCE TIMELINE
+   ============================================================
    A vertical timeline down the center of the page with alternating
-   content panels. Each entry contains a white card with job or
-   education details, a date/location label, and a circular icon.
-   The timeline alternates orientation on each row and includes
-   directional pointers to connect the cards to the central line.
---------------------------------------------------------------------- */
+   content panels. Each entry contains a card with job details,
+   a date/location label, and a circular icon.
+   ============================================================ */
 .timeline {
   position: relative;
   margin-top: 2rem;
@@ -841,15 +825,6 @@ h2::after {
   order: 3;
 }
 
-/* Directional pointers connecting card to vertical line */
-.timeline-item.left .timeline-card::after {
-  /* Removed arrow pseudo-element */
-}
-
-.timeline-item.right .timeline-card::after {
-  /* Removed arrow pseudo-element */
-}
-
 .timeline-card h3 {
   font-size: 1.1rem;
   font-weight: 600;
@@ -865,19 +840,24 @@ h2::after {
   font-style: italic;
 }
 
+/* Specific color override for Sight Studio LLC heading */
+.timeline-card h4.sight-studio {
+  color: #01201A !important;
+}
+
 .timeline-card p {
   font-size: 0.85rem;
   line-height: 1.5;
   color: var(--muted-text);
 }
 
-/*
- * Education section styling
- * The education section uses a simple card layout rather than the timeline. It
- * consists of an icon and text content arranged side by side on larger
- * screens and stacked on smaller devices. Colours and spacing match the
- * overall dark theme of the portfolio.
- */
+/* ============================================================
+   13. EDUCATION SECTION
+   ============================================================
+   The education section uses a simple card layout with an icon
+   and text content arranged side by side on larger screens
+   and stacked on smaller devices.
+   ============================================================ */
 .education__item {
   display: flex;
   align-items: flex-start;
@@ -940,6 +920,74 @@ h2::after {
   .education__icon {
     margin-bottom: 1rem;
   }
+  
+  /* ============================================================
+     MOBILE TIMELINE OPTIMIZATION
+     ============================================================ */
+  
+  /* Move timeline line to the left for single-column layout */
+  .timeline::before {
+    left: 20px;
+    transform: none;
+  }
+  
+  /* Convert to single-column layout */
+  .timeline-item {
+    display: flex;
+    flex-direction: column;
+    margin: 1.5rem 0;
+    padding-left: 50px;
+    position: relative;
+  }
+  
+  /* Position icon on the left */
+  .timeline-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 36px;
+    height: 36px;
+    z-index: 2;
+  }
+  
+  /* Reset card positioning for single column - cards always come first */
+  .timeline-item.left .timeline-card,
+  .timeline-item.right .timeline-card {
+    order: 1;
+    margin: 0;
+    width: 100%;
+  }
+  
+  /* Stack date below card for better readability - dates always come second */
+  .timeline-item.left .timeline-date,
+  .timeline-item.right .timeline-date {
+    order: 2;
+    text-align: left;
+    padding: 0;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--muted-text);
+  }
+  
+  /* Adjust card spacing */
+  .timeline-card {
+    padding: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Smaller text on mobile */
+  .timeline-card h3 {
+    font-size: 1rem;
+  }
+  
+  .timeline-card h4 {
+    font-size: 0.85rem;
+  }
+  
+  .timeline-card p {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
 }
 
 /* Prevent the vertical line from the timeline in the Work Experience section
@@ -950,7 +998,9 @@ h2::after {
   overflow: hidden;
 }
 
-/* Project card SVG icon styling (matches Expertise look) */
+/* ============================================================
+   14. PROJECT CARD ICONS
+   ============================================================ */
 .project-card__icon {
   width: 56px;
   height: 56px;
