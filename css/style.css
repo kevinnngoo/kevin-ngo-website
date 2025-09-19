@@ -62,7 +62,29 @@ a:focus {
 }
 
 /* ============================================================
-   3. HEADER NAVIGATION
+   3. ACCESSIBILITY - SKIP NAVIGATION
+   ============================================================ */
+.skip-nav {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--accent);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 9999;
+  border-radius: 0 0 4px 4px;
+  font-weight: 600;
+  transition: top 0.3s;
+}
+
+.skip-nav:focus {
+  top: 0;
+  color: white;
+}
+
+/* ============================================================
+   4. HEADER NAVIGATION
    ============================================================ */
 .header {
   width: 100%;
@@ -159,7 +181,7 @@ a:focus {
 }
 
 /* ============================================================
-   4. MOBILE NAVIGATION
+   5. MOBILE NAVIGATION
    ============================================================ */
 .mobile-menu {
   position: fixed;
@@ -223,7 +245,7 @@ a:focus {
 }
 
 /* ============================================================
-   5. HERO SECTION
+   6. HERO SECTION
    ============================================================ */
 .hero {
   position: relative;
@@ -314,7 +336,7 @@ a:focus {
 }
 
 /* ============================================================
-   6. GENERAL SECTION STYLES
+   7. GENERAL SECTION STYLES
    ============================================================ */
 section {
   padding: 4rem 0;
@@ -349,7 +371,7 @@ h2::after {
 }
 
 /* ============================================================
-   7. PROJECTS SECTION
+   8. PROJECTS SECTION
    ============================================================ */
 /* Subtle card hover effects for interactivity */
 .project-card:hover, .expertise-card:hover {
@@ -436,7 +458,7 @@ h2::after {
 }
 
 /* ============================================================
-   8. CONTACT SECTION
+   9. CONTACT SECTION
    ============================================================ */
 .contact p {
   margin-bottom: 1.5rem;
@@ -526,7 +548,7 @@ h2::after {
 }
 
 /* ============================================================
-   9. FOOTER
+   10. FOOTER
    ============================================================ */
 .footer {
   background-color: var(--surface-color);
@@ -569,7 +591,7 @@ h2::after {
 }
 
 /* ============================================================
-   10. RESPONSIVE DESIGN
+   11. RESPONSIVE DESIGN
    ============================================================ */
 @media (max-width: 900px) {
   .hero__content {
@@ -665,7 +687,7 @@ h2::after {
 }
 
 /* ============================================================
-   11. EXPERTISE SECTION
+   12. EXPERTISE SECTION
    ============================================================
    The expertise cards display areas of focus with an icon, title,
    description and a list of technologies. Cards are laid out in a
@@ -724,7 +746,7 @@ h2::after {
 }
 
 /* ============================================================
-   12. EXPERIENCE TIMELINE
+   13. EXPERIENCE TIMELINE
    ============================================================
    A vertical timeline down the center of the page with alternating
    content panels. Each entry contains a card with job details,
@@ -852,7 +874,7 @@ h2::after {
 }
 
 /* ============================================================
-   13. EDUCATION SECTION
+   14. EDUCATION SECTION
    ============================================================
    The education section uses a simple card layout with an icon
    and text content arranged side by side on larger screens
@@ -999,7 +1021,7 @@ h2::after {
 }
 
 /* ============================================================
-   14. PROJECT CARD ICONS
+   15. PROJECT CARD ICONS
    ============================================================ */
 .project-card__icon {
   width: 56px;

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page Not Found | Kevin Ngo Portfolio</title>
+    <meta name="description" content="The page you're looking for doesn't exist. Return to Kevin Ngo's portfolio homepage." />
+    <meta name="robots" content="noindex, nofollow" />
+    
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="./css/style.css" />
+    
+    <style>
+      /* 404 specific styles */
+      .error-404 {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem 1rem;
+      }
+      
+      .error-content {
+        max-width: 600px;
+      }
+      
+      .error-code {
+        font-size: 8rem;
+        font-weight: 900;
+        line-height: 1;
+        color: var(--accent);
+        margin-bottom: 1rem;
+        text-shadow: 0 0 20px rgba(22, 118, 76, 0.3);
+      }
+      
+      .error-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+      }
+      
+      .error-description {
+        font-size: 1.1rem;
+        color: var(--muted-text);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+      }
+      
+      .error-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .error-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background-color 0.3s, transform 0.2s;
+      }
+      
+      .error-btn:hover {
+        background-color: var(--accent-light);
+        transform: translateY(-2px);
+        color: #fff;
+      }
+      
+      .error-btn--secondary {
+        background-color: var(--surface-color);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+      }
+      
+      .error-btn--secondary:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--accent-light);
+      }
+      
+      @media (max-width: 768px) {
+        .error-code {
+          font-size: 6rem;
+        }
+        
+        .error-title {
+          font-size: 1.5rem;
+        }
+        
+        .error-description {
+          font-size: 1rem;
+        }
+        
+        .error-actions {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .error-btn {
+          width: 100%;
+          max-width: 280px;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="error-404">
+      <div class="error-content">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-description">
+          The page you're looking for doesn't exist or has been moved. 
+          Let's get you back to exploring my portfolio and projects.
+        </p>
+        <div class="error-actions">
+          <a href="/" class="error-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Go Home
+          </a>
+          <button onclick="history.back()" class="error-btn error-btn--secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polyline points="15,18 9,12 15,6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Go Back
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Set current year if needed
+      document.addEventListener('DOMContentLoaded', () => {
+        // Simple analytics for 404 tracking if Google Analytics is loaded
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'page_view', {
+            page_title: '404 - Page Not Found',
+            page_location: window.location.href
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

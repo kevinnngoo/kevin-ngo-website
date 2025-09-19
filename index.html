@@ -3,18 +3,84 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kevin Ngo | Portfolio</title>
+    <title>Kevin Ngo | Software Engineer Portfolio</title>
+    <meta name="description" content="Kevin Ngo is a software engineer specializing in full-stack development with Python, JavaScript, React, and Flask. Recent Computer Science graduate with experience in web development, machine learning, and healthcare technology." />
+    <meta name="keywords" content="Kevin Ngo, Software Engineer, Full Stack Developer, Python, JavaScript, React, Flask, Computer Science, Portfolio, Web Development" />
+    <meta name="author" content="Kevin Ngo" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kevinnngoo.github.io/kevin-ngo-website/" />
+    <meta property="og:title" content="Kevin Ngo | Software Engineer Portfolio" />
+    <meta property="og:description" content="Kevin Ngo is a software engineer specializing in full-stack development with Python, JavaScript, React, and Flask. Recent Computer Science graduate with experience in web development, machine learning, and healthcare technology." />
+    <meta property="og:image" content="https://kevinnngoo.github.io/kevin-ngo-website/images/headshot.png" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://kevinnngoo.github.io/kevin-ngo-website/" />
+    <meta property="twitter:title" content="Kevin Ngo | Software Engineer Portfolio" />
+    <meta property="twitter:description" content="Kevin Ngo is a software engineer specializing in full-stack development with Python, JavaScript, React, and Flask. Recent Computer Science graduate with experience in web development, machine learning, and healthcare technology." />
+    <meta property="twitter:image" content="https://kevinnngoo.github.io/kevin-ngo-website/images/headshot.png" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://kevinnngoo.github.io/kevin-ngo-website/" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./images/logo.png" />
+    
     <!-- Main stylesheet -->
     <link rel="stylesheet" href="./css/style.css" />
+    
+    <!-- Google Analytics (replace GA_MEASUREMENT_ID with your actual ID) -->
+    <!-- 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    -->
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Kevin Ngo",
+      "jobTitle": "Software Engineer",
+      "description": "Software engineer specializing in full-stack development with Python, JavaScript, React, and Flask",
+      "url": "https://kevinnngoo.github.io/kevin-ngo-website/",
+      "image": "https://kevinnngoo.github.io/kevin-ngo-website/images/headshot.png",
+      "sameAs": [
+        "https://github.com/kevinnngoo",
+        "https://www.linkedin.com/in/kevinqngo/"
+      ],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Springfield College"
+      },
+      "knowsAbout": ["Python", "JavaScript", "React", "Flask", "PostgreSQL", "Machine Learning", "Web Development"]
+    }
+    </script>
   </head>
   <body>
+    <!-- Skip navigation for accessibility -->
+    <a href="#main-content" class="skip-nav">Skip to main content</a>
+    
     <!-- Mobile menu overlay -->
-    <nav id="mobileMenu" class="mobile-menu">
+    <nav 
+      id="mobileMenu" 
+      class="mobile-menu" 
+      role="navigation" 
+      aria-label="Mobile navigation menu"
+    >
       <div class="mobile-menu__header">
         <img
           src="./images/logo.png"
-          alt="Kevin Ngo logo"
+          alt="Kevin Ngo logo - Professional software engineer branding"
           class="mobile-menu__logo"
+          loading="lazy"
         />
         <button
           id="closeMenu"
@@ -36,12 +102,16 @@
     </nav>
 
     <!-- Header navigation -->
-    <header class="header">
+    <header class="header" role="banner">
       <div class="header__container">
         <a href="#" class="header__logo" aria-label="Homepage">
-          <img src="./images/logo.png" alt="Kevin Ngo logo" />
+          <img 
+            src="./images/logo.png" 
+            alt="Kevin Ngo logo - Professional software engineer branding" 
+            loading="eager"
+          />
         </a>
-        <nav class="header__nav">
+        <nav class="header__nav" role="navigation" aria-label="Main navigation">
           <ul class="header__links">
             <li><a href="#about">About</a></li>
             <li><a href="#experience">Work Experience</a></li>
@@ -66,14 +136,16 @@
       </div>
     </header>
 
-    <main>
+    <main id="main-content" role="main">
       <!-- Hero section -->
       <section class="hero">
         <!-- Background decorative image -->
         <img
           src="./images/hero-bg.png"
-          alt="Decorative wave"
+          alt=""
           class="hero__bg"
+          loading="lazy"
+          role="presentation"
         />
         <div class="hero__content">
           <div class="hero__text">
@@ -139,219 +211,11 @@
             </div>
           </div>
           <div class="hero__image">
-            <img src="./images/headshot.png" alt="Kevin Ngo" />
-          </div>
-        </div>
-      </section>
-
-      <!-- Experience section (hidden original after hero) -->
-      <section id="experience-first" class="experience" style="display: none">
-        <div class="section__container">
-          <h2>Experience</h2>
-          <div class="timeline">
-            <!-- Optometric Technician (left orientation) -->
-            <div class="timeline-item left">
-              <div class="timeline-card">
-                <h3>Optometric Technician</h3>
-                <h4>Sight Studio LLC</h4>
-                <p>
-                  Perform diagnostic pre‑testing including Ishihara color vision
-                  screening, autorefractor testing and non‑contact tonometry to
-                  prepare patients for eye exams. Assist the optometrist by
-                  recording medical histories, managing patient flow and
-                  maintaining exam room cleanliness. Handle scheduling, payments
-                  and patient records while providing responsive front‑desk
-                  service.
-                </p>
-              </div>
-              <div class="timeline-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 7V6a5 5 0 0110 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V9a2 2 0 012-2h1zm2-1v1h6V6a3 3 0 00-6 0z"
-                  />
-                </svg>
-              </div>
-              <div class="timeline-date">
-                Apr 2025 – Present<br />
-                Enfield, CT
-              </div>
-            </div>
-            <!-- Pharmacy Technician (right orientation) -->
-            <div class="timeline-item right">
-              <div class="timeline-date">
-                Oct 2023 – Present<br />
-                Springfield, MA
-              </div>
-              <div class="timeline-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 7V6a5 5 0 0110 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V9a2 2 0 012-2h1zm2-1v1h6V6a3 3 0 00-6 0z"
-                  />
-                </svg>
-              </div>
-              <div class="timeline-card">
-                <h3>Pharmacy Technician</h3>
-                <h4>Caring Pharmacy</h4>
-                <p>
-                  Fulfil over 100 prescriptions daily with precision, addressing
-                  customer inquiries about medications and health products.
-                  Streamline inventory by designing and implementing a
-                  restocking system to ensure critical medications remain
-                  available. Collaborate with pharmacists and staff to maintain
-                  a clean, compliant and efficient environment.
-                </p>
-              </div>
-            </div>
-            <!-- Education milestone (left orientation) -->
-            <div class="timeline-item left">
-              <div class="timeline-card">
-                <h3>
-                  Bachelor of Science in Computer &amp; Information Sciences
-                </h3>
-                <h4>Springfield College</h4>
-                <p>
-                  Completed coursework in data structures, database development,
-                  operating systems and object‑oriented programming. Developed
-                  full‑stack projects using Python, JavaScript and PostgreSQL,
-                  graduating magna cum laude with a 3.78 GPA.
-                </p>
-              </div>
-              <div class="timeline-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 7V6a5 5 0 0110 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V9a2 2 0 012-2h1zm2-1v1h6V6a3 3 0 00-6 0z"
-                  />
-                </svg>
-              </div>
-              <div class="timeline-date">
-                Sep 2020 – May 2024<br />
-                Springfield, MA
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Experience section -->
-      <section id="experience-top" class="experience" style="display: none">
-        <div class="section__container">
-          <h2>Experience</h2>
-          <div class="timeline">
-            <!-- Optometric Technician (left orientation) -->
-            <div class="timeline-item left">
-              <div class="timeline-card">
-                <h3>Optometric Technician</h3>
-                <h4>Sight Studio LLC</h4>
-                <p>
-                  Perform diagnostic pre‑testing including Ishihara color vision
-                  screening, autorefractor testing and non‑contact tonometry to
-                  prepare patients for eye exams. Assist the optometrist by
-                  recording medical histories, managing patient flow and
-                  maintaining exam room cleanliness. Handle scheduling, payments
-                  and patient records while providing responsive front‑desk
-                  service.
-                </p>
-              </div>
-              <div class="timeline-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 7V6a5 5 0 0110 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V9a2 2 0 012-2h1zm2-1v1h6V6a3 3 0 00-6 0z"
-                  />
-                </svg>
-              </div>
-              <div class="timeline-date">
-                Apr 2025 – Present<br />
-                Enfield, CT
-              </div>
-            </div>
-            <!-- Pharmacy Technician (right orientation) -->
-            <div class="timeline-item right">
-              <div class="timeline-date">
-                Oct 2023 – Present<br />
-                Springfield, MA
-              </div>
-              <div class="timeline-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 7V6a5 5 0 0110 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V9a2 2 0 012-2h1zm2-1v1h6V6a3 3 0 00-6 0z"
-                  />
-                </svg>
-              </div>
-              <div class="timeline-card">
-                <h3>Pharmacy Technician</h3>
-                <h4>Caring Pharmacy</h4>
-                <p>
-                  Fulfil over 100 prescriptions daily with precision, addressing
-                  customer inquiries about medications and health products.
-                  Streamline inventory by designing and implementing a
-                  restocking system to ensure critical medications remain
-                  available. Collaborate with pharmacists and staff to maintain
-                  a clean, compliant and efficient environment.
-                </p>
-              </div>
-            </div>
-            <!-- Education milestone (left orientation) -->
-            <div class="timeline-item left">
-              <div class="timeline-card">
-                <h3>
-                  Bachelor of Science in Computer &amp; Information Sciences
-                </h3>
-                <h4>Springfield College</h4>
-                <p>
-                  Completed coursework in data structures, database development,
-                  operating systems and object‑oriented programming. Developed
-                  full‑stack projects using Python, JavaScript and PostgreSQL,
-                  graduating magna cum laude with a 3.78 GPA.
-                </p>
-              </div>
-              <div class="timeline-icon">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 7V6a5 5 0 0110 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V9a2 2 0 012-2h1zm2-1v1h6V6a3 3 0 00-6 0z"
-                  />
-                </svg>
-              </div>
-              <div class="timeline-date">
-                Sep 2020 – May 2024<br />
-                Springfield, MA
-              </div>
-            </div>
+            <img 
+              src="./images/headshot.png" 
+              alt="Kevin Ngo - Professional headshot of a software engineer with dark hair, wearing professional attire and smiling" 
+              loading="eager"
+            />
           </div>
         </div>
       </section>
