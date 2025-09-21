@@ -97,7 +97,8 @@ export default async function handler(req, res) {
             count: day.contributionCount,
             weekday: day.weekday
           }))
-        )
+        ),
+        totalContributions: user.contributionsCollection.contributionCalendar.totalContributions
       },
       timestamp: new Date().toISOString()
     };
