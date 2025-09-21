@@ -415,31 +415,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Initialize GitHub Activity component
-  if (typeof GitHubActivity !== 'undefined') {
-    // Wait for modules to load
-    setTimeout(() => {
-      import('./github-activity.js').then(module => {
-        const GitHubActivity = module.default;
-        window.githubActivity = new GitHubActivity('githubActivityContainer', {
-          username: 'kevinnngoo',
-          apiEndpoint: '/api/github-stats'
-        });
-      }).catch(error => {
-        console.warn('Failed to load GitHub Activity:', error);
-        // Show fallback message
-        const container = document.getElementById('githubActivityContainer');
-        if (container) {
-          container.innerHTML = `
-            <div class="github-activity__error">
-              <div class="error__icon">📊</div>
-              <div class="error__message">
-                <h3>GitHub Activity Unavailable</h3>
-                <p>Unable to load GitHub activity data at this time.</p>
-              </div>
-            </div>
-          `;
-        }
+  setTimeout(() => {
+    import('./github-activity.js').then(module => {
+      const GitHubActivity = module.default;
+      window.githubActivity = new GitHubActivity('githubActivityContainer', {
+        username: 'kevinnngoo'
+        // Note: No apiEndpoint needed - uses GitHub's public REST API directly
       });
-    }, 100);
-  }
+    }).catch(error => {
+      console.warn('Failed to load GitHub Activity:', error);
+      // Show fallback message
+      const container = document.getElementById('githubActivityContainer');
+      if (container) {
+        container.innerHTML = `
+          <div class="github-activity__error">
+            <div class="error__icon">📊</div>
+            <div class="error__message">
+              <h3>GitHub Activity Unavailable</h3>
+              <p>Unable to load GitHub activity data at this time.</p>
+            </div>
+          </div>
+        `;
+      }
+    });
+  }, 100);
 });
