@@ -53,8 +53,6 @@ export default async function handler(req, res) {
     const from = new Date();
     from.setFullYear(from.getFullYear() - 1);
 
-    console.log(`GitHub API Debug - Date range: ${from.toISOString()} to ${to.toISOString()}`);
-
     const response = await fetch('https://api.github.com/graphql', {
       method: 'POST',
       headers: {
@@ -99,7 +97,8 @@ export default async function handler(req, res) {
             count: day.contributionCount,
             weekday: day.weekday
           }))
-        )
+        ),
+        totalContributions: user.contributionsCollection.contributionCalendar.totalContributions
       },
       timestamp: new Date().toISOString()
     };

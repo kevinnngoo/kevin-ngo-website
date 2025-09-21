@@ -180,14 +180,24 @@ window.GitHubCharts = (function() {
     }
 
     processData() {
-      // Group data by weeks and calculate max contributions for color scaling
+      // Calculate max contributions for color scaling
       this.maxContributions = Math.max(...this.data.map(d => d.count));
+      
+      // Data is already flattened from the API, but we need to group it back into weeks
+      // GitHub weeks start on Sunday, so we need to group by actual weeks
       this.weeks = [];
       
-      // Group by weeks (7 days each)
-      for (let i = 0; i < this.data.length; i += 7) {
-        this.weeks.push(this.data.slice(i, i + 7));
-      }
+      // Group by weeks based on the date
+      let currentWeek = [];
+      this.data.forEach((day, index) => {
+        currentWeek.push(day);
+        
+        // If we have 7 days or it's the last day, complete the week
+        if (currentWeek.length === 7 || index === this.data.length - 1) {
+          this.weeks.push([...currentWeek]);
+          currentWeek = [];
+        }
+      });
     }
 
     render() {
@@ -360,4 +370,3 @@ window.GitHubCharts = (function() {
     ContributionHeatmap
   };
 })();
-

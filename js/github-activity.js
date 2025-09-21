@@ -71,82 +71,34 @@ class GitHubActivity {
   }
 
   /**
-   * Fetch fresh data from GitHub API (uses serverless function if apiEndpoint provided)
+   * Fetch fresh data from GitHub's public REST API (no token required)
    */
   async fetchFreshData(cacheKey) {
     try {
-      console.log('GitHub Activity: Making API calls...');
+      console.log('GitHub Activity: Making API call to serverless endpoint...');
       
-      if (this.apiEndpoint) {
-        // Use serverless function for full GraphQL data
-        console.log('GitHub Activity: Using serverless API endpoint:', this.apiEndpoint);
-        const response = await fetch(`${this.apiEndpoint}?username=${this.username}`);
-        
-        if (!response.ok) {
-          throw new Error(`API request failed: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.error) {
-          throw new Error(data.message || data.error);
-        }
-        
-        this.data = data;
-        cacheManager.set(cacheKey, data);
+      // Use our serverless GraphQL API
+      const response = await fetch(`/api/github-stats?username=${this.username}`);
+
+      console.log('GitHub Activity: API response received');
+      console.log('- Response status:', response.status);
+
+      if (!response.ok) {
+        const errorMsg = `GitHub API request failed with status: ${response.status}`;
+        console.error('GitHub Activity:', errorMsg);
+        throw new Error(errorMsg);
+      }
+
+      const normalizedData = await response.json();
+      console.log('GitHub Activity: Data received:', normalizedData); // Debug log
+      console.log('GitHub Activity: Calendar data length:', normalizedData.contributions?.calendar?.length); // Debug log
+
+      this.data = normalizedData;
+      cacheManager.set(cacheKey, normalizedData);
+
+      if (!this.isLoading) {
         this.render();
-        
       } else {
-        // Fallback to public REST API endpoints
-        console.log('GitHub Activity: Using public REST API...');
-        const [userResponse, reposResponse, eventsResponse] = await Promise.all([
-          fetch(`https://api.github.com/users/${this.username}`),
-          fetch(`https://api.github.com/users/${this.username}/repos?sort=pushed&per_page=6`),
-          fetch(`https://api.github.com/users/${this.username}/events/public?per_page=100`)
-        ]);
-
-        console.log('GitHub Activity: API responses received');
-        console.log('- User response status:', userResponse.status);
-        console.log('- Repos response status:', reposResponse.status);
-        console.log('- Events response status:', eventsResponse.status);
-
-        if (!userResponse.ok || !reposResponse.ok || !eventsResponse.ok) {
-          const errorMsg = `GitHub API request failed: User: ${userResponse.status}, Repos: ${reposResponse.status}, Events: ${eventsResponse.status}`;
-          console.error('GitHub Activity:', errorMsg);
-          throw new Error(errorMsg);
-        }
-
-        const [user, repos, events] = await Promise.all([
-          userResponse.json(),
-          reposResponse.json(),
-          eventsResponse.json()
-        ]);
-
-        // Process events to get contribution stats
-        const contributions = this.processEvents(events);
-        
-        // Process repositories for language stats  
-        const languages = await this.processRepositories(repos);
-
-        const normalizedData = {
-          contributions,
-          topLanguages: languages,
-          repos: repos.map(repo => ({
-            name: repo.name,
-            description: repo.description || '',
-            url: repo.html_url,
-            stars: repo.stargazers_count,
-            language: repo.language ? {
-              name: repo.language,
-              color: this.getLanguageColor(repo.language)
-            } : null,
-            pushedAt: repo.pushed_at
-          })),
-          timestamp: new Date().toISOString()
-        };
-
-        this.data = normalizedData;
-        cacheManager.set(cacheKey, normalizedData);
         this.render();
       }
 
@@ -161,124 +113,9 @@ class GitHubActivity {
     }
   }
 
-  /**
-   * Process GitHub events to get contribution statistics
-   */
-  processEvents(events) {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    let totalCommits = 0;
-    let totalPRs = 0;
-    let totalIssues = 0;
-    const calendar = [];
 
-    // Generate last 30 days for simple calendar
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      calendar.push({
-        date: date.toISOString().split('T')[0],
-        count: 0,
-        weekday: date.getDay()
-      });
-    }
 
-    events.forEach(event => {
-      const eventDate = new Date(event.created_at);
-      if (eventDate >= thirtyDaysAgo) {
-        const dateString = eventDate.toISOString().split('T')[0];
-        const calendarDay = calendar.find(day => day.date === dateString);
-        
-        if (calendarDay) {
-          calendarDay.count++;
-        }
-
-        switch (event.type) {
-          case 'PushEvent':
-            totalCommits += event.payload.commits ? event.payload.commits.length : 1;
-            break;
-          case 'PullRequestEvent':
-            totalPRs++;
-            break;
-          case 'IssuesEvent':
-            totalIssues++;
-            break;
-        }
-      }
-    });
-
-    return {
-      totalCommits,
-      totalPRs,
-      totalIssues,
-      calendar
-    };
-  }
-
-  /**
-   * Process repositories to get language statistics
-   */
-  async processRepositories(repos) {
-    const languageCount = new Map();
-    
-    // Count languages from repositories
-    repos.forEach(repo => {
-      if (repo.language) {
-        languageCount.set(repo.language, (languageCount.get(repo.language) || 0) + 1);
-      }
-    });
-
-    // Convert to percentage-based array
-    const totalRepos = repos.filter(repo => repo.language).length;
-    const languages = Array.from(languageCount.entries())
-      .map(([name, count]) => ({
-        name,
-        color: this.getLanguageColor(name),
-        percentage: totalRepos > 0 ? (count / totalRepos) * 100 : 0
-      }))
-      .sort((a, b) => b.percentage - a.percentage)
-      .slice(0, 8);
-
-    return languages;
-  }
-
-  /**
-   * Get color for programming language
-   */
-  getLanguageColor(language) {
-    const colors = {
-      'JavaScript': '#f1e05a',
-      'Python': '#3572A5',
-      'Java': '#b07219',
-      'TypeScript': '#2b7489',
-      'C++': '#f34b7d',
-      'C': '#555555',
-      'HTML': '#e34c26',
-      'CSS': '#563d7c',
-      'PHP': '#4F5D95',
-      'Ruby': '#701516',
-      'Go': '#00ADD8',
-      'Rust': '#dea584',
-      'Swift': '#ffac45',
-      'Kotlin': '#F18E33',
-      'C#': '#239120',
-      'Shell': '#89e051',
-      'Vue': '#2c3e50',
-      'React': '#61dafb',
-      'Dart': '#00B4AB'
-    };
-    return colors[language] || '#858585';
-  }
-
-  /**
-   * Aggregates language data (simplified version for public API)
-   */
-  aggregateLanguages(repos) {
-    // This method is now simplified since we're using the public API
-    // The actual language processing is done in processRepositories
-    return this.processRepositories(repos);
-  }
 
   /**
    * Render loading skeleton
