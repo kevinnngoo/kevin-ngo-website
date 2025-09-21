@@ -424,8 +424,8 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Creating GitHub Activity instance...');
       
       window.githubActivity = new GitHubActivity('githubActivityContainer', {
-        username: 'kevinnngoo'
-        // Note: No apiEndpoint needed - uses GitHub's public REST API directly
+        username: 'kevinnngoo',
+        apiEndpoint: '/api/github-stats'
       });
       
       console.log('GitHub Activity instance created');

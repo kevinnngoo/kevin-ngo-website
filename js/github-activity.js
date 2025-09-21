@@ -71,65 +71,82 @@ class GitHubActivity {
   }
 
   /**
-   * Fetch fresh data from GitHub's public REST API (no token required)
+   * Fetch fresh data from GitHub API (uses serverless function if apiEndpoint provided)
    */
   async fetchFreshData(cacheKey) {
     try {
-      console.log('GitHub Activity: Making API calls to GitHub...');
+      console.log('GitHub Activity: Making API calls...');
       
-      // Use public REST API endpoints instead of GraphQL
-      const [userResponse, reposResponse, eventsResponse] = await Promise.all([
-        fetch(`https://api.github.com/users/${this.username}`),
-        fetch(`https://api.github.com/users/${this.username}/repos?sort=pushed&per_page=6`),
-        fetch(`https://api.github.com/users/${this.username}/events/public?per_page=100`)
-      ]);
-
-      console.log('GitHub Activity: API responses received');
-      console.log('- User response status:', userResponse.status);
-      console.log('- Repos response status:', reposResponse.status);
-      console.log('- Events response status:', eventsResponse.status);
-
-      if (!userResponse.ok || !reposResponse.ok || !eventsResponse.ok) {
-        const errorMsg = `GitHub API request failed: User: ${userResponse.status}, Repos: ${reposResponse.status}, Events: ${eventsResponse.status}`;
-        console.error('GitHub Activity:', errorMsg);
-        throw new Error(errorMsg);
-      }
-
-      const [user, repos, events] = await Promise.all([
-        userResponse.json(),
-        reposResponse.json(),
-        eventsResponse.json()
-      ]);
-
-      // Process events to get contribution stats
-      const contributions = this.processEvents(events);
-      
-      // Process repositories for language stats
-      const languages = await this.processRepositories(repos);
-
-      const normalizedData = {
-        contributions,
-        topLanguages: languages,
-        repos: repos.map(repo => ({
-          name: repo.name,
-          description: repo.description || '',
-          url: repo.html_url,
-          stars: repo.stargazers_count,
-          language: repo.language ? {
-            name: repo.language,
-            color: this.getLanguageColor(repo.language)
-          } : null,
-          pushedAt: repo.pushed_at
-        })),
-        timestamp: new Date().toISOString()
-      };
-
-      this.data = normalizedData;
-      cacheManager.set(cacheKey, normalizedData);
-
-      if (!this.isLoading) {
+      if (this.apiEndpoint) {
+        // Use serverless function for full GraphQL data
+        console.log('GitHub Activity: Using serverless API endpoint:', this.apiEndpoint);
+        const response = await fetch(`${this.apiEndpoint}?username=${this.username}`);
+        
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.message || data.error);
+        }
+        
+        this.data = data;
+        cacheManager.set(cacheKey, data);
         this.render();
+        
       } else {
+        // Fallback to public REST API endpoints
+        console.log('GitHub Activity: Using public REST API...');
+        const [userResponse, reposResponse, eventsResponse] = await Promise.all([
+          fetch(`https://api.github.com/users/${this.username}`),
+          fetch(`https://api.github.com/users/${this.username}/repos?sort=pushed&per_page=6`),
+          fetch(`https://api.github.com/users/${this.username}/events/public?per_page=100`)
+        ]);
+
+        console.log('GitHub Activity: API responses received');
+        console.log('- User response status:', userResponse.status);
+        console.log('- Repos response status:', reposResponse.status);
+        console.log('- Events response status:', eventsResponse.status);
+
+        if (!userResponse.ok || !reposResponse.ok || !eventsResponse.ok) {
+          const errorMsg = `GitHub API request failed: User: ${userResponse.status}, Repos: ${reposResponse.status}, Events: ${eventsResponse.status}`;
+          console.error('GitHub Activity:', errorMsg);
+          throw new Error(errorMsg);
+        }
+
+        const [user, repos, events] = await Promise.all([
+          userResponse.json(),
+          reposResponse.json(),
+          eventsResponse.json()
+        ]);
+
+        // Process events to get contribution stats
+        const contributions = this.processEvents(events);
+        
+        // Process repositories for language stats  
+        const languages = await this.processRepositories(repos);
+
+        const normalizedData = {
+          contributions,
+          topLanguages: languages,
+          repos: repos.map(repo => ({
+            name: repo.name,
+            description: repo.description || '',
+            url: repo.html_url,
+            stars: repo.stargazers_count,
+            language: repo.language ? {
+              name: repo.language,
+              color: this.getLanguageColor(repo.language)
+            } : null,
+            pushedAt: repo.pushed_at
+          })),
+          timestamp: new Date().toISOString()
+        };
+
+        this.data = normalizedData;
+        cacheManager.set(cacheKey, normalizedData);
         this.render();
       }
 
