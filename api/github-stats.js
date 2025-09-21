@@ -19,9 +19,11 @@ export default async function handler(req, res) {
 
   if (!process.env.GITHUB_TOKEN) {
     console.error('GITHUB_TOKEN environment variable is not set');
+    console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('GITHUB') || k.includes('TOKEN')));
     return res.status(500).json({ 
       error: 'Server configuration error',
-      message: 'GitHub token not configured'
+      message: 'GitHub token not configured',
+      debug: 'Check Vercel environment variables'
     });
   }
 
