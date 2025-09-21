@@ -320,14 +320,13 @@ class GitHubActivity {
     this.container.innerHTML = `
       <div class="github-activity__content">
         ${this.renderStats()}
-        ${this.renderCharts()}
-        ${this.renderRepos()}
+        ${this.renderHeatmap()}
       </div>
     `;
 
-    // Initialize charts after DOM is ready
+    // Initialize heatmap after DOM is ready
     setTimeout(() => {
-      this.initializeCharts();
+      this.initializeHeatmap();
     }, 0);
   }
 
@@ -356,17 +355,11 @@ class GitHubActivity {
   }
 
   /**
-   * Render charts section
+   * Render heatmap section
    */
-  renderCharts() {
+  renderHeatmap() {
     return `
-      <div class="activity__charts">
-        <div class="chart__container">
-          <h3 class="chart__title">Top Languages</h3>
-          <div id="languagesChart" class="chart__content" role="img" aria-label="Programming languages usage chart">
-            <!-- Chart will be rendered here -->
-          </div>
-        </div>
+      <div class="activity__heatmap">
         <div class="chart__container">
           <h3 class="chart__title">Contribution Activity</h3>
           <div id="contributionHeatmap" class="chart__content" role="img" aria-label="GitHub contribution heatmap for the past year">
@@ -377,60 +370,13 @@ class GitHubActivity {
     `;
   }
 
-  /**
-   * Render repositories section
-   */
-  renderRepos() {
-    const { repos } = this.data;
-    
-    return `
-      <div class="activity__repos">
-        <h3 class="repos__title">Recent Repositories</h3>
-        <div class="repos__list">
-          ${repos.map(repo => `
-            <div class="repo__item">
-              <div class="repo__header">
-                <a href="${repo.url}" class="repo__name" target="_blank" rel="noopener noreferrer">
-                  ${repo.name}
-                </a>
-                <div class="repo__stars">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                    <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/>
-                  </svg>
-                  ${repo.stars}
-                </div>
-              </div>
-              ${repo.description ? `<p class="repo__description">${repo.description}</p>` : ''}
-              <div class="repo__meta">
-                ${repo.language ? `
-                  <span class="repo__language">
-                    <span class="language__color" style="background-color: ${repo.language.color}"></span>
-                    ${repo.language.name}
-                  </span>
-                ` : ''}
-                <span class="repo__updated">
-                  Updated ${this.formatDate(repo.pushedAt)}
-                </span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  }
+
 
   /**
-   * Initialize charts after DOM is rendered
+   * Initialize heatmap after DOM is rendered
    */
-  initializeCharts() {
+  initializeHeatmap() {
     if (window.GitHubCharts) {
-      // Initialize language donut chart
-      const languageChart = new window.GitHubCharts.DonutChart('languagesChart', {
-        data: this.data.topLanguages,
-        width: 200,
-        height: 200
-      });
-
       // Initialize contribution heatmap
       const heatmap = new window.GitHubCharts.ContributionHeatmap('contributionHeatmap', {
         data: this.data.contributions.calendar,
@@ -438,31 +384,15 @@ class GitHubActivity {
         height: 120
       });
     } else {
-      // Fallback to simple text lists if charts not loaded
-      this.renderSimpleCharts();
+      // Fallback to simple text if charts not loaded
+      this.renderSimpleHeatmap();
     }
   }
 
   /**
-   * Render simple text-based charts as fallback
+   * Render simple text-based heatmap as fallback
    */
-  renderSimpleCharts() {
-    // Simple language list
-    const languagesChart = document.getElementById('languagesChart');
-    if (languagesChart) {
-      languagesChart.innerHTML = `
-        <div class="simple-chart">
-          ${this.data.topLanguages.map(lang => `
-            <div class="language-item">
-              <span class="language-color" style="background-color: ${lang.color}"></span>
-              <span class="language-name">${lang.name}</span>
-              <span class="language-percentage">${lang.percentage.toFixed(1)}%</span>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
+  renderSimpleHeatmap() {
     // Simple contribution summary
     const heatmap = document.getElementById('contributionHeatmap');
     if (heatmap) {
@@ -531,4 +461,3 @@ class GitHubActivity {
 
 // Export for use in other modules
 export default GitHubActivity;
-

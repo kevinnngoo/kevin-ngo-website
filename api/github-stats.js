@@ -44,49 +44,7 @@ export default async function handler(req, res) {
               }
             }
           }
-          repositories(
-            first: 6
-            orderBy: { field: PUSHED_AT, direction: DESC }
-            privacy: PUBLIC
-            isFork: false
-          ) {
-            nodes {
-              name
-              description
-              url
-              stargazerCount
-              primaryLanguage {
-                name
-                color
-              }
-              pushedAt
-              languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
-                edges {
-                  size
-                  node {
-                    name
-                    color
-                  }
-                }
-              }
-            }
-          }
-          repositoriesContributedTo(
-            first: 100
-            contributionTypes: [COMMIT, ISSUE, PULL_REQUEST, REPOSITORY]
-          ) {
-            nodes {
-              languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
-                edges {
-                  size
-                  node {
-                    name
-                    color
-                  }
-                }
-              }
-            }
-          }
+
         }
       }
     `;
@@ -133,18 +91,6 @@ export default async function handler(req, res) {
           }))
         )
       },
-      topLanguages: aggregateLanguages(user),
-      repos: user.repositories.nodes.map(repo => ({
-        name: repo.name,
-        description: repo.description || '',
-        url: repo.url,
-        stars: repo.stargazerCount,
-        language: repo.primaryLanguage ? {
-          name: repo.primaryLanguage.name,
-          color: repo.primaryLanguage.color
-        } : null,
-        pushedAt: repo.pushedAt
-      })),
       timestamp: new Date().toISOString()
     };
 
@@ -162,69 +108,4 @@ export default async function handler(req, res) {
   }
 }
 
-/**
- * Aggregates language data from user's repositories and contributions
- * @param {Object} user - GitHub user data from GraphQL
- * @returns {Array} Array of language objects with name, color, and percentage
- */
-function aggregateLanguages(user) {
-  const languageMap = new Map();
-  let totalSize = 0;
-
-  // Process own repositories
-  user.repositories.nodes.forEach(repo => {
-    repo.languages.edges.forEach(edge => {
-      const lang = edge.node;
-      const size = edge.size;
-      
-      if (languageMap.has(lang.name)) {
-        languageMap.set(lang.name, {
-          ...languageMap.get(lang.name),
-          size: languageMap.get(lang.name).size + size
-        });
-      } else {
-        languageMap.set(lang.name, {
-          name: lang.name,
-          color: lang.color || '#858585',
-          size: size
-        });
-      }
-      totalSize += size;
-    });
-  });
-
-  // Process contributed repositories (with lower weight)
-  user.repositoriesContributedTo.nodes.forEach(repo => {
-    repo.languages.edges.forEach(edge => {
-      const lang = edge.node;
-      const size = Math.floor(edge.size * 0.1); // 10% weight for contributions
-      
-      if (languageMap.has(lang.name)) {
-        languageMap.set(lang.name, {
-          ...languageMap.get(lang.name),
-          size: languageMap.get(lang.name).size + size
-        });
-      } else {
-        languageMap.set(lang.name, {
-          name: lang.name,
-          color: lang.color || '#858585',
-          size: size
-        });
-      }
-      totalSize += size;
-    });
-  });
-
-  // Convert to array and calculate percentages
-  const languages = Array.from(languageMap.values())
-    .map(lang => ({
-      name: lang.name,
-      color: lang.color,
-      percentage: totalSize > 0 ? (lang.size / totalSize) * 100 : 0
-    }))
-    .sort((a, b) => b.percentage - a.percentage)
-    .slice(0, 8); // Top 8 languages
-
-  return languages;
-}
 
