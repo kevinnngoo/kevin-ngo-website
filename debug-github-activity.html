@@ -65,7 +65,51 @@
             try {
                 const response = await fetch('/api/github-stats?username=kevinnngoo');
                 const data = await response.json();
-                results.textContent = JSON.stringify(data, null, 2);
+                
+                // Show detailed analysis
+                let analysis = `API Response Analysis:\n\n`;
+                analysis += `Total Commits: ${data.contributions?.totalCommits || 'N/A'}\n`;
+                analysis += `Total PRs: ${data.contributions?.totalPRs || 'N/A'}\n`;
+                analysis += `Total Issues: ${data.contributions?.totalIssues || 'N/A'}\n\n`;
+                
+                if (data.contributions?.calendar) {
+                    const calendar = data.contributions.calendar;
+                    analysis += `Calendar entries: ${calendar.length}\n`;
+                    
+                    // Find date range
+                    const dates = calendar.map(d => d.date).sort();
+                    analysis += `Date range: ${dates[0]} to ${dates[dates.length - 1]}\n`;
+                    
+                    // Count non-zero days
+                    const activeDays = calendar.filter(d => d.count > 0);
+                    analysis += `Active days: ${activeDays.length}\n`;
+                    
+                    // Total contributions
+                    const totalContributions = calendar.reduce((sum, day) => sum + day.count, 0);
+                    analysis += `Total contributions: ${totalContributions}\n\n`;
+                    
+                    // Show first few and last few entries
+                    analysis += `First 5 entries:\n`;
+                    calendar.slice(0, 5).forEach(day => {
+                        analysis += `  ${day.date}: ${day.count}\n`;
+                    });
+                    
+                    analysis += `\nLast 5 entries:\n`;
+                    calendar.slice(-5).forEach(day => {
+                        analysis += `  ${day.date}: ${day.count}\n`;
+                    });
+                    
+                    // Show active days
+                    if (activeDays.length > 0) {
+                        analysis += `\nActive days (first 10):\n`;
+                        activeDays.slice(0, 10).forEach(day => {
+                            analysis += `  ${day.date}: ${day.count}\n`;
+                        });
+                    }
+                }
+                
+                analysis += `\n\nFull JSON:\n${JSON.stringify(data, null, 2)}`;
+                results.textContent = analysis;
             } catch (error) {
                 results.textContent = `Error: ${error.message}`;
             }
