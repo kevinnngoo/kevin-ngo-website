@@ -1203,11 +1203,8 @@ h2::after {
   letter-spacing: 0.5px;
 }
 
-/* Activity Charts */
-.activity__charts {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 2rem;
+/* Activity Heatmap */
+.activity__heatmap {
   margin-bottom: 3rem;
 }
 
@@ -1532,13 +1529,9 @@ h2::after {
     font-size: 2rem;
   }
 
-  .activity__charts {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
 
-  .chart__container,
-  .activity__repos {
+
+  .chart__container {
     padding: 1.5rem;
   }
 
@@ -1573,8 +1566,7 @@ h2::after {
     font-size: 1.1rem;
   }
 
-  .chart__container,
-  .activity__repos {
+  .chart__container {
     padding: 1rem;
   }
 }
