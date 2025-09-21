@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Activity Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+
+      #githubActivityContainer {
+        border: 1px solid #333;
+        padding: 20px;
+        margin: 20px 0;
+        min-height: 200px;
+      }
+
+      .github-activity__error {
+        color: #ff6b6b;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .github-activity__content {
+        color: #00ff00;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>GitHub Activity Test</h1>
+    <p>Testing GitHub Activity component in isolation...</p>
+
+    <div id="githubActivityContainer">
+      <p>Loading GitHub Activity...</p>
+    </div>
+
+    <div id="debug-output">
+      <h3>Debug Output:</h3>
+      <pre id="debug-log"></pre>
+    </div>
+
+    <script type="module">
+      // Override console methods to capture output
+      const debugLog = document.getElementById("debug-log");
+      const originalLog = console.log;
+      const originalError = console.error;
+      const originalWarn = console.warn;
+
+      function addDebugLine(type, message) {
+        debugLog.textContent += `[${type.toUpperCase()}] ${message}\n`;
+      }
+
+      console.log = (...args) => {
+        originalLog(...args);
+        addDebugLine("log", args.join(" "));
+      };
+
+      console.error = (...args) => {
+        originalError(...args);
+        addDebugLine("error", args.join(" "));
+      };
+
+      console.warn = (...args) => {
+        originalWarn(...args);
+        addDebugLine("warn", args.join(" "));
+      };
+
+      // Test the GitHub Activity component
+      async function testGitHubActivity() {
+        try {
+          console.log("Starting GitHub Activity test...");
+
+          // Import cache manager first
+          console.log("Importing cache manager...");
+          const cacheModule = await import("./js/cache-manager.js");
+          console.log("Cache manager imported successfully");
+
+          // Import GitHub Activity component
+          console.log("Importing GitHub Activity component...");
+          const module = await import("./js/github-activity.js");
+          const GitHubActivity = module.default;
+          console.log("GitHub Activity component imported successfully");
+
+          console.log("Creating GitHub Activity instance...");
+          window.githubActivity = new GitHubActivity(
+            "githubActivityContainer",
+            {
+              username: "kevinnngoo",
+            }
+          );
+          console.log("GitHub Activity instance created successfully");
+        } catch (error) {
+          console.error("Failed to load GitHub Activity:", error);
+          const container = document.getElementById("githubActivityContainer");
+          if (container) {
+            container.innerHTML = `
+                        <div class="github-activity__error">
+                            <div class="error__icon">❌</div>
+                            <div class="error__message">
+                                <h3>GitHub Activity Failed</h3>
+                                <p>Error: ${error.message}</p>
+                            </div>
+                        </div>
+                    `;
+          }
+        }
+      }
+
+      // Run the test
+      console.log("DOM loaded, starting test...");
+      testGitHubActivity();
+    </script>
+  </body>
+</html>
