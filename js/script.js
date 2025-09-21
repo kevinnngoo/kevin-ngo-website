@@ -416,14 +416,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize GitHub Activity component
   setTimeout(() => {
+    console.log('Attempting to load GitHub Activity component...');
+    
     import('./github-activity.js').then(module => {
+      console.log('GitHub Activity module loaded successfully');
       const GitHubActivity = module.default;
+      console.log('Creating GitHub Activity instance...');
+      
       window.githubActivity = new GitHubActivity('githubActivityContainer', {
         username: 'kevinnngoo'
         // Note: No apiEndpoint needed - uses GitHub's public REST API directly
       });
+      
+      console.log('GitHub Activity instance created');
     }).catch(error => {
-      console.warn('Failed to load GitHub Activity:', error);
+      console.error('Failed to load GitHub Activity:', error);
       // Show fallback message
       const container = document.getElementById('githubActivityContainer');
       if (container) {
@@ -433,6 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="error__message">
               <h3>GitHub Activity Unavailable</h3>
               <p>Unable to load GitHub activity data at this time.</p>
+              <p><small>Error: ${error.message}</small></p>
             </div>
           </div>
         `;

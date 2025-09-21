@@ -27,7 +27,9 @@ class GitHubActivity {
    * Initialize the component
    */
   async init() {
+    console.log('GitHub Activity: Initializing component for user:', this.username);
     this.renderSkeleton();
+    console.log('GitHub Activity: Skeleton rendered, loading data...');
     await this.loadData();
   }
 
@@ -35,16 +37,18 @@ class GitHubActivity {
    * Load GitHub activity data with caching
    */
   async loadData() {
+    console.log('GitHub Activity: Starting loadData for user:', this.username);
     this.isLoading = true;
     this.error = null;
 
     try {
       // Check cache first
       const cacheKey = this.username;
+      console.log('GitHub Activity: Checking cache for key:', cacheKey);
       const cachedData = cacheManager.get(cacheKey);
 
       if (cachedData) {
-        console.log('Using cached GitHub activity data');
+        console.log('GitHub Activity: Using cached data');
         this.data = cachedData;
         this.render();
         
@@ -53,11 +57,12 @@ class GitHubActivity {
         return;
       }
 
+      console.log('GitHub Activity: No cache found, fetching fresh data...');
       // No cache, fetch fresh data
       await this.fetchFreshData(cacheKey);
 
     } catch (error) {
-      console.error('Error loading GitHub activity:', error);
+      console.error('GitHub Activity: Error loading data:', error);
       this.error = error.message;
       this.renderError();
     } finally {
@@ -70,6 +75,8 @@ class GitHubActivity {
    */
   async fetchFreshData(cacheKey) {
     try {
+      console.log('GitHub Activity: Making API calls to GitHub...');
+      
       // Use public REST API endpoints instead of GraphQL
       const [userResponse, reposResponse, eventsResponse] = await Promise.all([
         fetch(`https://api.github.com/users/${this.username}`),
@@ -77,8 +84,15 @@ class GitHubActivity {
         fetch(`https://api.github.com/users/${this.username}/events/public?per_page=100`)
       ]);
 
+      console.log('GitHub Activity: API responses received');
+      console.log('- User response status:', userResponse.status);
+      console.log('- Repos response status:', reposResponse.status);
+      console.log('- Events response status:', eventsResponse.status);
+
       if (!userResponse.ok || !reposResponse.ok || !eventsResponse.ok) {
-        throw new Error(`GitHub API request failed`);
+        const errorMsg = `GitHub API request failed: User: ${userResponse.status}, Repos: ${reposResponse.status}, Events: ${eventsResponse.status}`;
+        console.error('GitHub Activity:', errorMsg);
+        throw new Error(errorMsg);
       }
 
       const [user, repos, events] = await Promise.all([
