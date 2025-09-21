@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Activity Test - Force Refresh</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
+        .btn {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .btn:hover {
+            background: #2ea043;
+        }
+        #results {
+            background: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        #githubActivity {
+            margin-top: 20px;
+            padding: 20px;
+            background: #161b22;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub Activity Debug Tool</h1>
+    <p>This tool helps debug and refresh GitHub Activity data.</p>
+    
+    <button class="btn" onclick="testAPI()">Test API Directly</button>
+    <button class="btn" onclick="clearCache()">Clear Cache</button>
+    <button class="btn" onclick="refreshActivity()">Refresh GitHub Activity</button>
+    <button class="btn" onclick="loadActivity()">Load GitHub Activity Component</button>
+    
+    <div id="results"></div>
+    <div id="githubActivity"></div>
+
+    <script type="module">
+        import GitHubActivity from './js/github-activity.js';
+
+        let githubActivity = null;
+
+        window.testAPI = async function() {
+            const results = document.getElementById('results');
+            results.textContent = 'Testing API...';
+            
+            try {
+                const response = await fetch('/api/github-stats?username=kevinnngoo');
+                const data = await response.json();
+                results.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                results.textContent = `Error: ${error.message}`;
+            }
+        };
+
+        window.clearCache = function() {
+            localStorage.clear();
+            document.getElementById('results').textContent = 'Cache cleared!';
+        };
+
+        window.refreshActivity = async function() {
+            if (githubActivity) {
+                await githubActivity.refresh();
+                document.getElementById('results').textContent = 'GitHub Activity refreshed!';
+            } else {
+                document.getElementById('results').textContent = 'Please load GitHub Activity component first.';
+            }
+        };
+
+        window.loadActivity = function() {
+            const container = document.getElementById('githubActivity');
+            container.innerHTML = '<div id="githubActivityContainer"></div>';
+            
+            githubActivity = new GitHubActivity('githubActivityContainer', {
+                username: 'kevinnngoo',
+                apiEndpoint: '/api/github-stats'
+            });
+            
+            document.getElementById('results').textContent = 'GitHub Activity component loaded!';
+        };
+    </script>
+</body>
+</html>
