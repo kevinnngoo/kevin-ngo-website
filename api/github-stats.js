@@ -27,9 +27,9 @@ export default async function handler(req, res) {
 
   try {
     const query = `
-      query($username: String!) {
+      query($username: String!, $from: DateTime!, $to: DateTime!) {
         user(login: $username) {
-          contributionsCollection {
+          contributionsCollection(from: $from, to: $to) {
             totalCommitContributions
             totalPullRequestContributions
             totalIssueContributions
@@ -44,10 +44,14 @@ export default async function handler(req, res) {
               }
             }
           }
-
         }
       }
     `;
+
+    // Calculate date range for the last year
+    const to = new Date();
+    const from = new Date();
+    from.setFullYear(from.getFullYear() - 1);
 
     const response = await fetch('https://api.github.com/graphql', {
       method: 'POST',
@@ -57,7 +61,11 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         query,
-        variables: { username }
+        variables: { 
+          username,
+          from: from.toISOString(),
+          to: to.toISOString()
+        }
       })
     });
 
@@ -107,5 +115,3 @@ export default async function handler(req, res) {
     });
   }
 }
-
-
