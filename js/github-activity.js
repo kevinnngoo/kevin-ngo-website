@@ -374,11 +374,23 @@ class GitHubActivity {
    * Render heatmap section
    */
   renderHeatmap() {
+    const currentYear = new Date().getFullYear();
+    const years = [currentYear - 2, currentYear - 1, currentYear]; // 2023, 2024, 2025
+
     return `
       <div class="activity__heatmap">
         <div class="chart__container">
-          <h3 class="chart__title">Contribution Activity</h3>
-          <div id="contributionHeatmap" class="chart__content" role="img" aria-label="GitHub contribution heatmap for the past year">
+          <div class="heatmap__header">
+            <h3 class="chart__title">Contribution Activity</h3>
+            <div class="year__selector">
+              ${years.map(year => `
+                <button class="year__button ${year === currentYear ? 'active' : ''}" data-year="${year}">
+                  ${year}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+          <div id="contributionHeatmap" class="chart__content" role="img" aria-label="GitHub contribution heatmap">
             <!-- Heatmap will be rendered here -->
           </div>
         </div>
@@ -393,11 +405,12 @@ class GitHubActivity {
    */
   initializeHeatmap() {
     if (window.GitHubCharts) {
-      // Initialize contribution heatmap
+      // Initialize contribution heatmap with compact dimensions
       const heatmap = new window.GitHubCharts.ContributionHeatmap('contributionHeatmap', {
         data: this.data.contributions.calendar,
-        width: 800,
-        height: 120
+        width: 600,
+        height: 100,
+        year: new Date().getFullYear()
       });
     } else {
       // Fallback to simple text if charts not loaded

@@ -165,10 +165,11 @@ window.GitHubCharts = (function() {
     constructor(containerId, options = {}) {
       this.container = document.getElementById(containerId);
       this.data = options.data || [];
-      this.width = options.width || 800;
-      this.height = options.height || 120;
-      this.cellSize = 12;
-      this.cellGap = 2;
+      this.selectedYear = options.year || new Date().getFullYear();
+      this.width = options.width || 600; // Smaller width
+      this.height = options.height || 100; // Smaller height
+      this.cellSize = 8; // Smaller cells
+      this.cellGap = 1; // Smaller gap
       
       if (!this.container) {
         console.error(`Container with id "${containerId}" not found`);
@@ -177,6 +178,7 @@ window.GitHubCharts = (function() {
 
       this.processData();
       this.render();
+      this.setupYearToggle();
     }
 
     processData() {
@@ -206,155 +208,91 @@ window.GitHubCharts = (function() {
         return;
       }
 
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('width', this.width);
-      svg.setAttribute('height', this.height);
-      svg.setAttribute('viewBox', `0 0 ${this.width} ${this.height}`);
-      svg.setAttribute('role', 'img');
-      svg.setAttribute('aria-label', 'GitHub contribution activity heatmap for the past year');
-
-      // Add month labels
-      this.addMonthLabels(svg);
-      
-      // Add day labels
-      this.addDayLabels(svg);
-
-      // Add contribution squares
-      this.weeks.forEach((week, weekIndex) => {
-        week.forEach((day, dayIndex) => {
-          const x = 30 + weekIndex * (this.cellSize + this.cellGap);
-          const y = 20 + dayIndex * (this.cellSize + this.cellGap);
-          
-          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-          rect.setAttribute('x', x);
-          rect.setAttribute('y', y);
-          rect.setAttribute('width', this.cellSize);
-          rect.setAttribute('height', this.cellSize);
-          rect.setAttribute('rx', 2);
-          rect.setAttribute('fill', this.getContributionColor(day.count));
-          rect.setAttribute('class', 'contribution-day');
-          rect.setAttribute('data-date', day.date);
-          rect.setAttribute('data-count', day.count);
-          rect.setAttribute('aria-label', `${day.date}, ${day.count} contribution${day.count !== 1 ? 's' : ''}`);
-          
-          // Add hover effects
-          rect.addEventListener('mouseenter', (e) => this.showTooltip(e, day));
-          rect.addEventListener('mouseleave', () => this.hideTooltip());
-          
-          svg.appendChild(rect);
-        });
-      });
-
-      // Add legend
-      this.addLegend(svg);
-
+      // Clear container
       this.container.innerHTML = '';
-      this.container.appendChild(svg);
-    }
 
-    addMonthLabels(svg) {
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const weeksPerMonth = 4.33; // Approximate
+      // Create compact heatmap grid
+      const heatmapGrid = document.createElement('div');
+      heatmapGrid.className = 'heatmap-grid';
       
-      months.forEach((month, index) => {
-        const x = 30 + (index * weeksPerMonth * (this.cellSize + this.cellGap));
+      // Filter data for selected year
+      const yearData = this.getYearData(this.selectedYear);
+      
+      // Create grid of contribution squares
+      yearData.forEach((day, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'heatmap-cell';
+        cell.setAttribute('data-date', day.date);
+        cell.setAttribute('data-count', day.count);
+        cell.setAttribute('title', `${day.count} contributions on ${this.formatDate(day.date)}`);
         
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', x);
-        text.setAttribute('y', 15);
-        text.setAttribute('class', 'heatmap-month-label');
-        text.textContent = month;
+        // Set color intensity based on contribution count
+        const intensity = this.getIntensity(day.count);
+        cell.setAttribute('data-level', intensity);
         
-        svg.appendChild(text);
+        heatmapGrid.appendChild(cell);
       });
+
+      this.container.appendChild(heatmapGrid);
     }
 
-    addDayLabels(svg) {
-      const days = ['Mon', 'Wed', 'Fri'];
-      const dayIndices = [0, 2, 4]; // Monday, Wednesday, Friday
+    getYearData(year) {
+      // Generate 365 days for the selected year
+      const startDate = new Date(year, 0, 1);
+      const endDate = new Date(year, 11, 31);
+      const yearData = [];
       
-      dayIndices.forEach((dayIndex, index) => {
-        const y = 20 + dayIndex * (this.cellSize + this.cellGap) + this.cellSize / 2;
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        const dateString = d.toISOString().split('T')[0];
+        const existingData = this.data.find(item => item.date === dateString);
         
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', 25);
-        text.setAttribute('y', y + 4);
-        text.setAttribute('text-anchor', 'end');
-        text.setAttribute('class', 'heatmap-day-label');
-        text.textContent = days[index];
-        
-        svg.appendChild(text);
-      });
+        yearData.push({
+          date: dateString,
+          count: existingData ? existingData.count : 0,
+          weekday: d.getDay()
+        });
+      }
+      
+      return yearData;
     }
 
-    addLegend(svg) {
-      const legendX = this.width - 150;
-      const legendY = this.height - 20;
-      
-      // "Less" label
-      const lessText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      lessText.setAttribute('x', legendX);
-      lessText.setAttribute('y', legendY);
-      lessText.setAttribute('class', 'heatmap-legend-label');
-      lessText.textContent = 'Less';
-      svg.appendChild(lessText);
-      
-      // Color squares
-      const colors = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
-      colors.forEach((color, index) => {
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', legendX + 30 + index * 14);
-        rect.setAttribute('y', legendY - 10);
-        rect.setAttribute('width', 10);
-        rect.setAttribute('height', 10);
-        rect.setAttribute('rx', 2);
-        rect.setAttribute('fill', color);
-        svg.appendChild(rect);
-      });
-      
-      // "More" label
-      const moreText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      moreText.setAttribute('x', legendX + 100);
-      moreText.setAttribute('y', legendY);
-      moreText.setAttribute('class', 'heatmap-legend-label');
-      moreText.textContent = 'More';
-      svg.appendChild(moreText);
+    getIntensity(count) {
+      if (count === 0) return 0;
+      if (count <= 2) return 1;
+      if (count <= 5) return 2;
+      if (count <= 10) return 3;
+      return 4;
     }
 
-    getContributionColor(count) {
-      if (count === 0) return '#ebedf0';
-      
-      const intensity = Math.min(count / Math.max(this.maxContributions, 1), 1);
-      
-      if (intensity <= 0.25) return '#9be9a8';
-      if (intensity <= 0.5) return '#40c463';
-      if (intensity <= 0.75) return '#30a14e';
-      return '#216e39';
-    }
-
-    showTooltip(event, day) {
-      const tooltip = document.createElement('div');
-      tooltip.className = 'chart-tooltip';
-      
-      const date = new Date(day.date);
-      const formattedDate = date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        weekday: 'short', 
         year: 'numeric', 
-        month: 'long', 
+        month: 'short', 
         day: 'numeric' 
       });
-      
-      tooltip.innerHTML = `
-        <strong>${formattedDate}</strong><br>
-        ${day.count} contribution${day.count !== 1 ? 's' : ''}
-      `;
-      
-      document.body.appendChild(tooltip);
-      
-      const rect = event.target.getBoundingClientRect();
-      tooltip.style.left = rect.left + rect.width / 2 + 'px';
-      tooltip.style.top = rect.top - tooltip.offsetHeight - 10 + 'px';
     }
+
+    setupYearToggle() {
+      // Find year buttons and add event listeners
+      const yearButtons = document.querySelectorAll('.year__button');
+      yearButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          // Remove active class from all buttons
+          yearButtons.forEach(btn => btn.classList.remove('active'));
+          
+          // Add active class to clicked button
+          e.target.classList.add('active');
+          
+          // Update selected year and re-render
+          this.selectedYear = parseInt(e.target.dataset.year);
+          this.render();
+        });
+      });
+    }
+
+  }
 
     hideTooltip() {
       const tooltip = document.querySelector('.chart-tooltip');
