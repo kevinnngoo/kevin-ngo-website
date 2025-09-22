@@ -1667,6 +1667,7 @@ h2::after {
 .github-calendar-container {
   background-color: var(--surface-color);
   padding: 2rem;
+  padding-bottom: 2.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1683,7 +1684,10 @@ h2::after {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   font-size: 0.8rem;
   color: var(--muted-text);
 }
@@ -1699,6 +1703,17 @@ h2::after {
 
 .github-calendar-container .calendar .contrib-number:hover {
   color: var(--accent-light);
+}
+
+/* Add spacing between calendar sections */
+.github-calendar-container .calendar > div:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+/* Ensure proper spacing for any text content in calendar */
+.github-calendar-container .calendar .text-gray {
+  margin: 1rem 0;
+  padding: 0.5rem 0;
 }
 
 /* Contribution squares with our color scheme */
