@@ -27,16 +27,14 @@ class GitHubActivity {
     this.container = document.getElementById(containerId);
     this.username = options.username || 'kevinnngoo';
     this.apiEndpoint = options.apiEndpoint || '/api/github-stats';
-    // Determine which years to show.  Show 2023 and 2024 only to avoid showing
-    // zero contributions for 2025
+    // Determine which years to show. Include current year and previous years
     const currentYear = new Date().getFullYear();
-    this.availableYears = options.years || [2023, 2024];
+    this.availableYears = options.years || [currentYear - 2, currentYear - 1, currentYear];
     // Holds contribution data keyed by year.  Each entry has the shape
     // { totalCommits, totalPRs, totalIssues, calendar: [...], totalContributions }.
     this.yearData = {};
-    // The year currently selected for display.  Default to 2024 as the most recent
-    // year with meaningful contribution data.
-    this.selectedYear = 2024;
+    // The year currently selected for display. Default to current year
+    this.selectedYear = currentYear;
 
     // Placeholder for language distribution.  The object structure is
     // { name: string, color: string, percentage: number }.  This data
@@ -232,8 +230,8 @@ class GitHubActivity {
     // `.activity__stats` for styling.  The year buttons get an `active`
     // class when selected to allow styling.
     this.container.innerHTML = `
+      <h3 class="activity__title">${total.toLocaleString()} contributions in ${year}</h3>
       <div class="activity__stats">
-        <h3>${total.toLocaleString()} contributions in ${year}</h3>
         <div class="stats__cards">
           <div class="stats__card"><span>${(data.totalCommits || 0).toLocaleString()}</span> Commits</div>
           <div class="stats__card"><span>${(data.totalPRs || 0).toLocaleString()}</span> Pull Requests</div>
