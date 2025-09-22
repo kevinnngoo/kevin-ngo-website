@@ -304,6 +304,14 @@ class GitHubActivity {
           <div id="languagesChart" class="chart__content"></div>
         </div>
         
+        <!-- GitHub Contributions Calendar -->
+        <div class="chart__section chart__section--full">
+          <h3 class="chart__title">GitHub Contributions Calendar</h3>
+          <div id="github-calendar" class="github-calendar-container">
+            Loading GitHub contributions...
+          </div>
+        </div>
+        
         <!-- Year Toggle and Contribution Activity -->
         <div class="chart__section chart__section--full">
           <div class="year__selector">
@@ -332,6 +340,8 @@ class GitHubActivity {
     this.renderHeatmap();
     // Initialize languages chart placeholder
     this.initializeLanguagesChart();
+    // Initialize GitHub Calendar widget
+    this.initializeGitHubCalendar();
   }
 
   /**
@@ -440,6 +450,44 @@ class GitHubActivity {
   }
 
   /**
+   * Initialize the GitHub Calendar widget using the github-calendar library.
+   * This creates a beautiful contribution calendar with tooltips and responsive design.
+   */
+  initializeGitHubCalendar() {
+    // Check if GitHubCalendar is available
+    if (typeof GitHubCalendar !== 'function') {
+      console.warn('GitHubActivity: GitHubCalendar library not loaded');
+      const container = document.getElementById('github-calendar');
+      if (container) {
+        container.innerHTML = '<p>GitHub Calendar library not available</p>';
+      }
+      return;
+    }
+
+    try {
+      // Initialize the GitHub calendar with responsive design and tooltips
+      GitHubCalendar("#github-calendar", this.username, {
+        responsive: true,
+        tooltips: true,
+        cache: 21600, // Cache for 6 hours (same as our cache manager)
+        summary_text: `Summary of pull requests, issues opened, and commits made by ${this.username}`
+      }).catch(error => {
+        console.error('Failed to load GitHub calendar:', error);
+        const container = document.getElementById('github-calendar');
+        if (container) {
+          container.innerHTML = '<p>Unable to load GitHub contributions calendar</p>';
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing GitHub calendar:', error);
+      const container = document.getElementById('github-calendar');
+      if (container) {
+        container.innerHTML = '<p>Error loading GitHub contributions calendar</p>';
+      }
+    }
+  }
+
+  /**
    * Render a basic skeleton while data is loading.  This prevents layout
    * shift and gives users feedback that content is on its way.
    */
@@ -467,6 +515,10 @@ class GitHubActivity {
         <div class="chart__section chart__section--full skeleton">
           <div class="chart__title skeleton__text"></div>
           <div class="chart__content skeleton__chart"></div>
+        </div>
+        <div class="chart__section chart__section--full skeleton">
+          <div class="chart__title skeleton__text"></div>
+          <div class="github-calendar-container skeleton__chart"></div>
         </div>
         <div class="chart__section chart__section--full skeleton">
           <div class="year__selector">

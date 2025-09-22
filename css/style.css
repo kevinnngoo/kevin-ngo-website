@@ -1500,6 +1500,81 @@ h2::after {
   background-color: var(--accent-light);
 }
 
+/* GitHub Calendar Integration */
+.github-calendar-container {
+  background-color: var(--surface-color);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+/* Override github-calendar library styles to match our theme */
+.github-calendar-container .calendar {
+  font-family: inherit;
+  color: var(--text-color);
+}
+
+.github-calendar-container .calendar .contrib-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: var(--muted-text);
+}
+
+.github-calendar-container .calendar .contrib-legend-item {
+  margin-left: 0.5rem;
+}
+
+.github-calendar-container .calendar .contrib-number {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.github-calendar-container .calendar .contrib-number:hover {
+  color: var(--accent-light);
+}
+
+/* Contribution squares with our color scheme */
+.github-calendar-container .calendar .contrib-square {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.github-calendar-container .calendar .contrib-square.color-0 {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.github-calendar-container .calendar .contrib-square.color-1 {
+  background-color: rgba(22, 118, 76, 0.3);
+}
+
+.github-calendar-container .calendar .contrib-square.color-2 {
+  background-color: rgba(22, 118, 76, 0.5);
+}
+
+.github-calendar-container .calendar .contrib-square.color-3 {
+  background-color: rgba(22, 118, 76, 0.7);
+}
+
+.github-calendar-container .calendar .contrib-square.color-4 {
+  background-color: var(--accent);
+}
+
+/* Tooltip styling */
+.github-calendar-container .calendar .contrib-tooltip {
+  background-color: var(--surface-color);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-color);
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
 /* Tooltip */
 .chart-tooltip {
   position: absolute;
