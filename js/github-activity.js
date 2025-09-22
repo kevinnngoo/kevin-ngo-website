@@ -375,17 +375,24 @@ class GitHubActivity {
    * Render heatmap section
    */
   renderHeatmap() {
-    const currentYear = new Date().getFullYear();
-    const years = [currentYear - 2, currentYear - 1, currentYear]; // 2023, 2024, 2025
+    // Determine available years from data
+    const calendar = this.data.contributions.calendar;
+    const years = Array.from(new Set(calendar.map(day => new Date(day.date).getFullYear()))).sort();
+    const selectedYear = this.selectedYear || years[years.length - 1];
+    // Filter data for selected year
+    const yearData = calendar.filter(day => new Date(day.date).getFullYear() === selectedYear);
+    const totalContributions = yearData.reduce((sum, day) => sum + day.count, 0);
 
     return `
       <div class="activity__heatmap">
         <div class="chart__container">
-          <div class="heatmap__header">
-            <h3 class="chart__title">Contribution Activity</h3>
-            <div class="year__selector">
+          <div class="heatmap__header" style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-color);">
+              ${totalContributions} contributions in the last year
+            </div>
+            <div class="year__selector" style="display: flex; gap: 0.5rem;">
               ${years.map(year => `
-                <button class="year__button ${year === currentYear ? 'active' : ''}" data-year="${year}">
+                <button class="year__button ${year === selectedYear ? 'active' : ''}" data-year="${year}">
                   ${year}
                 </button>
               `).join('')}
@@ -394,10 +401,6 @@ class GitHubActivity {
           <div class="heatmap__content">
             <div id="contributionHeatmap" class="chart__content" role="img" aria-label="GitHub contribution heatmap">
               <!-- Heatmap will be rendered here -->
-            </div>
-            <div class="heatmap__summary">
-              <span class="summary__text">Total contributions this year: <strong id="totalContributions">0</strong></span>
-              <span class="summary__text">Most active day: <strong id="mostActiveDay">-</strong></span>
             </div>
           </div>
         </div>
@@ -411,18 +414,38 @@ class GitHubActivity {
    * Initialize heatmap after DOM is rendered
    */
   initializeHeatmap() {
+    // Find selected year from active button
+    const calendar = this.data.contributions.calendar;
+    const years = Array.from(new Set(calendar.map(day => new Date(day.date).getFullYear()))).sort();
+    let selectedYear = years[years.length - 1];
+    const activeBtn = document.querySelector('.year__button.active');
+    if (activeBtn) {
+      selectedYear = parseInt(activeBtn.dataset.year);
+      this.selectedYear = selectedYear;
+    }
+    const yearData = calendar.filter(day => new Date(day.date).getFullYear() === selectedYear);
     if (window.GitHubCharts) {
-      // Initialize contribution heatmap with compact dimensions
-      const heatmap = new window.GitHubCharts.ContributionHeatmap('contributionHeatmap', {
-        data: this.data.contributions.calendar,
+      // Initialize contribution heatmap for selected year
+      new window.GitHubCharts.ContributionHeatmap('contributionHeatmap', {
+        data: yearData,
         width: 600,
         height: 100,
-        year: new Date().getFullYear()
+        year: selectedYear
       });
     } else {
       // Fallback to simple text if charts not loaded
       this.renderSimpleHeatmap();
     }
+    // Attach year toggle events
+    const yearBtns = document.querySelectorAll('.year__button');
+    yearBtns.forEach(btn => {
+      btn.onclick = (e) => {
+        yearBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.selectedYear = parseInt(btn.dataset.year);
+        this.render();
+      };
+    });
   }
 
   /**
