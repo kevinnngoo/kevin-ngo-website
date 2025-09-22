@@ -88,10 +88,24 @@ class GitHubActivity {
   async fetchYearData(year) {
     const cacheKey = `${this.username}_${year}`;
     const cached = cacheManager.get(cacheKey);
-    if (cached) {
+    const currentYear = new Date().getFullYear();
+    
+    // For current year, use shorter cache or force refresh for more accurate data
+    if (cached && year !== currentYear) {
       this.yearData[year] = cached;
       return;
     }
+    
+    // For current year, check if cache is recent (1 hour instead of 6 hours)
+    if (cached && year === currentYear) {
+      const cacheAge = Date.now() - new Date(cached.timestamp || 0).getTime();
+      const oneHour = 60 * 60 * 1000;
+      if (cacheAge < oneHour) {
+        this.yearData[year] = cached;
+        return;
+      }
+    }
+    
     try {
       const url = `${this.apiEndpoint}?username=${encodeURIComponent(this.username)}&year=${year}`;
       const response = await fetch(url);
@@ -104,19 +118,22 @@ class GitHubActivity {
       }
       // Assign the normalised contributions to our yearData storage.  The
       // backend returns totalCommits, totalPRs, totalIssues, calendar and
-      // totalContributions, but we compute totalContributions from the
-      // calendar on the client for robustness.
+      // totalContributions. Use GitHub's totalContributions as it's more accurate
+      // and includes all types of contributions (commits, reviews, etc.)
       const contrib = payload.contributions;
-      // Calculate total contributions if not provided.
-      const total = Array.isArray(contrib.calendar)
-        ? contrib.calendar.reduce((sum, day) => sum + (day.count || 0), 0)
-        : 0;
+      // Use GitHub's totalContributions as the primary source, with calendar fallback
+      const total = typeof contrib.totalContributions === 'number' 
+        ? contrib.totalContributions 
+        : (Array.isArray(contrib.calendar) 
+          ? contrib.calendar.reduce((sum, day) => sum + (day.count || 0), 0)
+          : 0);
       this.yearData[year] = {
         totalCommits: contrib.totalCommits || 0,
         totalPRs: contrib.totalPRs || 0,
         totalIssues: contrib.totalIssues || 0,
         calendar: Array.isArray(contrib.calendar) ? contrib.calendar : [],
-        totalContributions: typeof contrib.totalContributions === 'number' ? contrib.totalContributions : total
+        totalContributions: total,
+        timestamp: new Date().toISOString()
       };
       cacheManager.set(cacheKey, this.yearData[year]);
     } catch (error) {
@@ -257,7 +274,6 @@ class GitHubActivity {
           Loading GitHub contributions...
         </div>
       </div>
-      <div id="contributionHeatmap" class="activity__heatmap"></div>
     `;
     // Attach click handlers for year buttons.  When a new year is selected
     // we simply update the state and re‑render the view.
@@ -270,9 +286,7 @@ class GitHubActivity {
         }
       });
     });
-    // Draw the heatmap for the selected year.
-    this.renderHeatmap();
-
+    
     // Draw the languages chart if language data is available.  This
     // invocation is deferred until after the DOM is updated.
     this.renderLanguages();
