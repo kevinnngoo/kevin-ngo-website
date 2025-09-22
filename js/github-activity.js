@@ -44,7 +44,7 @@ class GitHubActivity {
    */
   async fetchYearData(year) {
     try {
-      const res = await fetch(`/api/github-stats.js?username=${this.username}&year=${year}`);
+      const res = await fetch(`/api/github-stats?username=${this.username}&year=${year}`);
       if (!res.ok) throw new Error(`Failed to fetch data for year ${year}`);
       const data = await res.json();
       this.yearData[year] = data.contributions;

@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { username = 'kevinnngoo' } = req.query;
+  const { username = 'kevinnngoo', year } = req.query;
 
   if (!process.env.GITHUB_TOKEN) {
     console.error('GITHUB_TOKEN environment variable is not set');
@@ -50,10 +50,19 @@ export default async function handler(req, res) {
       }
     `;
 
-    // Calculate date range for the last year
-    const to = new Date();
-    const from = new Date();
-    from.setFullYear(from.getFullYear() - 1);
+    // Calculate date range based on year parameter or default to last year
+    let to, from;
+    if (year) {
+      // For specific year, get Jan 1 to Dec 31 of that year
+      const targetYear = parseInt(year);
+      from = new Date(`${targetYear}-01-01T00:00:00Z`);
+      to = new Date(`${targetYear}-12-31T23:59:59Z`);
+    } else {
+      // Default to last year from current date
+      to = new Date();
+      from = new Date();
+      from.setFullYear(from.getFullYear() - 1);
+    }
 
     const response = await fetch('https://api.github.com/graphql', {
       method: 'POST',
