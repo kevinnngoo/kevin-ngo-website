@@ -1203,6 +1203,156 @@ h2::after {
   letter-spacing: 0.5px;
 }
 
+/* ChatGPT Version Activity Stats */
+.activity__stats h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent-light);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.stats__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stats__card {
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.stats__card:hover {
+  transform: translateY(-2px);
+}
+
+.stats__card span {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-light);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Activity Year Toggle */
+.activity__year-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.year__button {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.year__button:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+.year__button.active {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* Activity Languages */
+.activity__languages {
+  background-color: var(--surface-color);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
+}
+
+.activity__languages h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+}
+
+.languages__chart-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.languages__legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.languages__legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-percentage {
+  margin-left: auto;
+  color: var(--muted-text);
+  font-weight: 500;
+}
+
+/* Skeleton states for ChatGPT version */
+.skeleton-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  height: 60px;
+  border-radius: 8px;
+  animation: pulse 2s infinite;
+}
+
+.skeleton-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.skeleton-chart {
+  width: 200px;
+  height: 200px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.skeleton-legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.skeleton-heatmap {
+  height: 120px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  animation: pulse 2s infinite;
+}
+
 /* Activity Heatmap */
 .activity__heatmap {
   margin-bottom: 3rem;

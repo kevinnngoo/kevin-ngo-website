@@ -40,6 +40,15 @@ class GitHubActivity {
       ? currentYear
       : this.availableYears[this.availableYears.length - 1];
 
+    // Placeholder for language distribution.  The object structure is
+    // { name: string, color: string, percentage: number }.  This data
+    // will be populated via fetchLanguages() either from the API or
+    // fallback values.  It is stored at the instance level because
+    // languages are not year‑specific in this implementation.
+    // Note: we initialise only once here; do not reassign later to avoid
+    // losing references when fetchLanguages() populates the array.
+    this.languages = [];
+
     if (!this.container) {
       console.error(`GitHubActivity: container element with id "${containerId}" not found`);
       return;
@@ -59,6 +68,13 @@ class GitHubActivity {
    * populated.
    */
   async init() {
+    // Fetch the top languages once.  We do this first because it does not
+    // depend on the year and we want the information available for the
+    // initial render.  We deliberately do not await this call in order
+    // to overlap network latency with year data fetching.
+    this.fetchLanguages().catch(err => {
+      console.error('GitHubActivity: failed to fetch languages', err);
+    });
     for (const year of this.availableYears) {
       await this.fetchYearData(year);
     }
@@ -125,17 +141,68 @@ class GitHubActivity {
         totalContributions: fallbackTotals.commits + fallbackTotals.prs + fallbackTotals.issues
       };
     }
-    
-    // Fetch languages data separately if we don't have it yet
-    if (!this.languagesData) {
-      await this.fetchLanguagesData();
-    }
   }
 
   /**
-   * Generate fallback calendar data for a year.  Produces a calendar with
-   * some realistic contribution data so the heatmap is visible even when
-   * the API request fails.
+   * Fetch top language distribution for the user.  This method attempts
+   * to retrieve a `topLanguages` array from the backend API.  If the
+   * serverless function does not provide this information, fallback
+   * values are used.  The distribution is stored on the instance as
+   * `this.languages` and will be rendered by renderLanguages().
+   */
+  async fetchLanguages() {
+    try {
+      // Attempt to hit the backend API to retrieve top languages.  We
+      // request without a year parameter because languages are not
+      // year‑specific.  Some implementations of /api/github-stats
+      // return a topLanguages property on the root JSON object or on
+      // the contributions object.  We handle both cases.
+      const url = `${this.apiEndpoint}?username=${encodeURIComponent(this.username)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      let langs = [];
+      if (data.topLanguages && Array.isArray(data.topLanguages)) {
+        langs = data.topLanguages;
+      } else if (data.contributions && data.contributions.topLanguages) {
+        langs = data.contributions.topLanguages;
+      }
+      if (langs.length) {
+        // Normalise percentages so that they sum to 100.  The API may
+        // return a `percent` or `percentage` property.  We support both.
+        const total = langs.reduce((sum, l) => sum + (l.percent || l.percentage || 0), 0);
+        this.languages = langs.map(l => {
+          const pct = l.percent || l.percentage || 0;
+          return {
+            name: l.name || l.language || 'Unknown',
+            color: l.color || '#888888',
+            percentage: total ? (pct / total) * 100 : 0
+          };
+        });
+        return;
+      }
+      // If the API did not return language data, fall through to fallback.
+    } catch (err) {
+      // Intentionally silent; fallback will be used below.
+      console.warn('GitHubActivity: could not retrieve language data from API');
+    }
+    // Fallback language distribution.  These values can be adjusted
+    // according to your actual portfolio.  Colors are selected from
+    // GitHub language colors for popular languages.
+    this.languages = [
+      { name: 'JavaScript', color: '#f1e05a', percentage: 40 },
+      { name: 'TypeScript', color: '#3178c6', percentage: 30 },
+      { name: 'HTML', color: '#e34c26', percentage: 13 },
+      { name: 'Python', color: '#3572A5', percentage: 10 },
+      { name: 'Other', color: '#6f42c1', percentage: 7 }
+    ];
+  }
+
+  /**
+   * Generate fallback calendar data for a year.  Produces a zero‑filled
+   * calendar with a day entry for each day of the year.  This ensures that
+   * the heatmap component always has data to render even when the API
+   * request fails.
    *
    * @param {number} year - Four‑digit year.
    * @returns {Array} Array of day objects with date, count and weekday.
@@ -145,126 +212,13 @@ class GitHubActivity {
     const start = new Date(`${year}-01-01T00:00:00Z`);
     const end = new Date(`${year}-12-31T23:59:59Z`);
     for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
-      // Generate semi-realistic contribution data
-      const dayOfWeek = d.getUTCDay();
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-      const isWeekday = !isWeekend;
-      
-      // Base contribution level (lower on weekends)
-      let contributions = 0;
-      if (isWeekday) {
-        // Weekdays: higher chance of contributions
-        const rand = Math.random();
-        if (rand > 0.3) { // 70% chance of some activity
-          contributions = Math.floor(Math.random() * 4) + 1;
-          // Occasional high activity days
-          if (rand > 0.85) {
-            contributions += Math.floor(Math.random() * 6);
-          }
-        }
-      } else {
-        // Weekends: occasional activity
-        if (Math.random() > 0.7) {
-          contributions = Math.floor(Math.random() * 3);
-        }
-      }
-      
       calendar.push({
         date: d.toISOString().split('T')[0],
-        count: contributions,
-        weekday: dayOfWeek
+        count: 0,
+        weekday: d.getUTCDay()
       });
     }
     return calendar;
-  }
-
-  /**
-   * Fetch programming languages data from GitHub API
-   */
-  async fetchLanguagesData() {
-    const cacheKey = `${this.username}_languages`;
-    const cached = cacheManager.get(cacheKey);
-    if (cached) {
-      this.languagesData = cached;
-      return;
-    }
-    
-    try {
-      // Fetch user repositories to get language data
-      const response = await fetch(`https://api.github.com/users/${this.username}/repos?per_page=100&sort=updated`);
-      if (!response.ok) {
-        throw new Error(`GitHub repos API failed: ${response.status}`);
-      }
-      
-      const repos = await response.json();
-      const languageCount = new Map();
-      let totalSize = 0;
-      
-      // Process repositories to count languages
-      repos.forEach(repo => {
-        if (repo.language && repo.size > 0) {
-          const currentCount = languageCount.get(repo.language) || 0;
-          languageCount.set(repo.language, currentCount + repo.size);
-          totalSize += repo.size;
-        }
-      });
-      
-      // Convert to chart-ready format
-      const languages = Array.from(languageCount.entries())
-        .map(([name, size]) => ({
-          name,
-          percentage: totalSize > 0 ? (size / totalSize) * 100 : 0,
-          color: this.getLanguageColor(name),
-          size
-        }))
-        .sort((a, b) => b.percentage - a.percentage)
-        .slice(0, 6); // Top 6 languages
-      
-      this.languagesData = languages;
-      cacheManager.set(cacheKey, languages);
-      
-    } catch (error) {
-      console.error('Failed to fetch languages data:', error);
-      // Fallback languages data
-      this.languagesData = [
-        { name: 'JavaScript', percentage: 35, color: '#f1e05a' },
-        { name: 'Python', percentage: 28, color: '#3572A5' },
-        { name: 'HTML', percentage: 15, color: '#e34c26' },
-        { name: 'CSS', percentage: 12, color: '#563d7c' },
-        { name: 'TypeScript', percentage: 7, color: '#2b7489' },
-        { name: 'Shell', percentage: 3, color: '#89e051' }
-      ];
-    }
-  }
-
-  /**
-   * Get color for programming language
-   */
-  getLanguageColor(language) {
-    const colors = {
-      'JavaScript': '#f1e05a',
-      'Python': '#3572A5',
-      'Java': '#b07219',
-      'TypeScript': '#2b7489',
-      'C++': '#f34b7d',
-      'C': '#555555',
-      'HTML': '#e34c26',
-      'CSS': '#563d7c',
-      'PHP': '#4F5D95',
-      'Ruby': '#701516',
-      'Go': '#00ADD8',
-      'Rust': '#dea584',
-      'Swift': '#ffac45',
-      'Kotlin': '#F18E33',
-      'C#': '#239120',
-      'Shell': '#89e051',
-      'Vue': '#2c3e50',
-      'React': '#61dafb',
-      'Dart': '#00B4AB',
-      'Jupyter Notebook': '#DA5B0B',
-      'Dockerfile': '#384d54'
-    };
-    return colors[language] || '#858585';
   }
 
   /**
@@ -276,54 +230,39 @@ class GitHubActivity {
     const year = this.selectedYear;
     const data = this.yearData[year] || { totalCommits: 0, totalPRs: 0, totalIssues: 0, calendar: [], totalContributions: 0 };
     const total = data.totalContributions;
-    // Construct the inner HTML using existing CSS classes for compatibility
+    // Construct the inner HTML.  We rely on existing CSS classes such as
+    // `.activity__stats` for styling.  The year buttons get an `active`
+    // class when selected to allow styling.
     this.container.innerHTML = `
-      <div class="github-activity__content">
-        <div class="activity__stats">
-          <div class="stat__item">
-            <div class="stat__number">${total.toLocaleString()}</div>
-            <div class="stat__label">contributions in ${year}</div>
-          </div>
-          <div class="stat__item">
-            <div class="stat__number">${(data.totalCommits || 0).toLocaleString()}</div>
-            <div class="stat__label">Commits</div>
-          </div>
-          <div class="stat__item">
-            <div class="stat__number">${(data.totalPRs || 0).toLocaleString()}</div>
-            <div class="stat__label">Pull Requests</div>
-          </div>
-          <div class="stat__item">
-            <div class="stat__number">${(data.totalIssues || 0).toLocaleString()}</div>
-            <div class="stat__label">Issues</div>
-          </div>
-        </div>
-        
-        <!-- Top Languages - Full Width -->
-        <div class="chart__section chart__section--full">
-          <h3 class="chart__title">Top Languages</h3>
-          <div id="languagesChart" class="chart__content"></div>
-        </div>
-        
-        <!-- GitHub Contributions Calendar -->
-        <div class="chart__section chart__section--full">
-          <h3 class="chart__title">GitHub Contributions Calendar</h3>
-          <div id="github-calendar" class="github-calendar-container">
-            Loading GitHub contributions...
-          </div>
-        </div>
-        
-        <!-- Year Toggle and Contribution Activity -->
-        <div class="chart__section chart__section--full">
-          <div class="year__selector">
-            ${this.availableYears.map(y => `
-              <button class="year__button${y === year ? ' active' : ''}" data-year="${y}">${y}</button>
-            `).join('')}
-          </div>
-          <div id="contributionHeatmap" class="activity__heatmap"></div>
+      <div class="activity__stats">
+        <h3>${total.toLocaleString()} contributions in ${year}</h3>
+        <div class="stats__cards">
+          <div class="stats__card"><span>${(data.totalCommits || 0).toLocaleString()}</span> Commits</div>
+          <div class="stats__card"><span>${(data.totalPRs || 0).toLocaleString()}</span> Pull Requests</div>
+          <div class="stats__card"><span>${(data.totalIssues || 0).toLocaleString()}</span> Issues</div>
         </div>
       </div>
+      <div class="activity__year-toggle">
+        ${this.availableYears.map(y => `
+          <button class="year__button${y === year ? ' active' : ''}" data-year="${y}">${y}</button>
+        `).join('')}
+      </div>
+      <div class="activity__languages">
+        <h4>Top Languages</h4>
+        <div class="languages__chart-wrapper">
+          <canvas id="languagesChart" width="200" height="200"></canvas>
+          <ul class="languages__legend"></ul>
+        </div>
+      </div>
+      <!-- GitHub Contributions Calendar -->
+      <div class="chart__section chart__section--full">
+        <h4>GitHub Contributions Calendar</h4>
+        <div id="github-calendar" class="github-calendar-container">
+          Loading GitHub contributions...
+        </div>
+      </div>
+      <div id="contributionHeatmap" class="activity__heatmap"></div>
     `;
-    
     // Attach click handlers for year buttons.  When a new year is selected
     // we simply update the state and re‑render the view.
     this.container.querySelectorAll('.year__button').forEach(btn => {
@@ -335,11 +274,13 @@ class GitHubActivity {
         }
       });
     });
-    
     // Draw the heatmap for the selected year.
     this.renderHeatmap();
-    // Initialize languages chart placeholder
-    this.initializeLanguagesChart();
+
+    // Draw the languages chart if language data is available.  This
+    // invocation is deferred until after the DOM is updated.
+    this.renderLanguages();
+    
     // Initialize GitHub Calendar widget
     this.initializeGitHubCalendar();
   }
@@ -357,96 +298,100 @@ class GitHubActivity {
       console.warn('GitHubActivity: Heatmap container not found');
       return;
     }
-    
-    if (window.GitHubCharts && typeof window.GitHubCharts.ContributionHeatmap === 'function') {
-      // Clear previous contents before drawing
-      container.innerHTML = '';
-      try {
-        new window.GitHubCharts.ContributionHeatmap('contributionHeatmap', {
-          data: data,
-          year: year,
-          width: 800,
-          height: 150
-        });
-      } catch (error) {
-        console.error('Failed to render heatmap:', error);
-        this.renderHeatmapFallback(container, data);
-      }
-    } else {
-      this.renderHeatmapFallback(container, data);
-    }
-  }
-
-  /**
-   * Render fallback heatmap display
-   */
-  renderHeatmapFallback(container, data) {
-    const total = data.reduce((sum, d) => sum + (d.count || 0), 0);
-    const maxDay = data.reduce((max, d) => d.count > max.count ? d : max, { count: 0, date: '' });
-    
-    container.innerHTML = `
-      <div class="heatmap-fallback">
-        <p><strong>${total.toLocaleString()}</strong> total contributions</p>
-        ${maxDay.count > 0 ? `<p>Most active day: <strong>${maxDay.count}</strong> contributions on ${new Date(maxDay.date).toLocaleDateString()}</p>` : ''}
-        <div class="contribution-summary">
-          <span class="summary-text">Contribution data loaded (${data.length} days)</span>
-        </div>
-      </div>
-    `;
-  }
-
-  /**
-   * Initialize languages chart using DonutChart from github-charts.js
-   */
-  initializeLanguagesChart() {
-    const container = document.getElementById('languagesChart');
-    if (!container) return;
-    
-    if (!this.languagesData || !this.languagesData.length) {
-      container.innerHTML = `
-        <div class="languages-placeholder">
-          <p>Loading languages data...</p>
-        </div>
-      `;
+    // Always draw a custom heatmap grid.  Determine the maximum count to
+    // scale colours across five intensity levels similar to GitHub's own
+    // heatmap palette.
+    container.innerHTML = '';
+    if (!Array.isArray(data) || !data.length) {
+      container.innerHTML = '<p>No contribution data available.</p>';
       return;
     }
-
-    // Use the DonutChart from github-charts.js
-    if (window.GitHubCharts && typeof window.GitHubCharts.DonutChart === 'function') {
-      // Clear previous contents
-      container.innerHTML = '';
-      try {
-        new window.GitHubCharts.DonutChart('languagesChart', {
-          data: this.languagesData,
-          width: 300,
-          height: 300,
-          innerRadius: 80,
-          outerRadius: 120
-        });
-      } catch (error) {
-        console.error('Failed to render languages chart:', error);
-        this.renderLanguagesFallback(container);
+    const max = data.reduce((m, d) => Math.max(m, d.count || 0), 0);
+    // Define thresholds for 5 levels (0 through 4).  Avoid division by zero.
+    const thresholds = max > 0
+      ? [0, max * 0.25, max * 0.5, max * 0.75, max]
+      : [0, 1, 2, 3, 4];
+    // Colour palette from GitHub contribution graphs
+    const palette = ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'];
+    // Create grid container
+    const grid = document.createElement('div');
+    grid.className = 'heatmap-grid';
+    // Determine number of weeks (columns)
+    const cols = Math.ceil(data.length / 7);
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = `repeat(${cols}, 12px)`;
+    grid.style.gridTemplateRows = 'repeat(7, 12px)';
+    grid.style.gap = '2px';
+    // For accessibility: use a paragraph summarising contributions
+    const totalContributions = data.reduce((sum, d) => sum + (d.count || 0), 0);
+    const summary = document.createElement('p');
+    summary.textContent = `${totalContributions.toLocaleString()} contributions in ${year}`;
+    container.appendChild(summary);
+    // Build the grid cells
+    for (let i = 0; i < data.length; i++) {
+      const day = data[i];
+      const count = day.count || 0;
+      // Determine intensity level based on thresholds
+      let level = 0;
+      for (let t = 0; t < thresholds.length; t++) {
+        if (count <= thresholds[t]) {
+          level = t;
+          break;
+        }
       }
-    } else {
-      this.renderLanguagesFallback(container);
+      const cell = document.createElement('span');
+      cell.className = 'heatmap-cell';
+      cell.style.width = '12px';
+      cell.style.height = '12px';
+      cell.style.backgroundColor = palette[level];
+      cell.style.borderRadius = '2px';
+      cell.title = `${day.date}: ${count} contributions`;
+      // Use aria-label for screen readers
+      cell.setAttribute('aria-label', `${day.date}: ${count} contributions`);
+      grid.appendChild(cell);
     }
+    container.appendChild(grid);
   }
 
   /**
-   * Render fallback languages display
+   * Render the top languages donut chart.  Uses the `<canvas>` element
+   * inserted in render() and populates the legend list.  The chart is
+   * redrawn every time render() is called to ensure it stays in sync
+   * with the current language distribution.
    */
-  renderLanguagesFallback(container) {
-    container.innerHTML = `
-      <div class="languages-fallback">
-        ${this.languagesData.map(lang => `
-          <div class="language-item">
-            <span class="language-color" style="background-color: ${lang.color}"></span>
-            <span class="language-name">${lang.name}</span>
-            <span class="language-percentage">${lang.percentage.toFixed(1)}%</span>
-          </div>
-        `).join('')}
-      </div>
-    `;
+  renderLanguages() {
+    const canvas = this.container.querySelector('#languagesChart');
+    const legend = this.container.querySelector('.languages__legend');
+    if (!canvas || !legend) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const languages = this.languages || [];
+    // Clear canvas and legend
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    legend.innerHTML = '';
+    if (!languages.length) {
+      legend.innerHTML = '<li>No language data</li>';
+      return;
+    }
+    // Compute total percentage to normalise; expected to sum to 100
+    const totalPct = languages.reduce((sum, l) => sum + (l.percentage || 0), 0);
+    let startAngle = -Math.PI / 2; // Start at top (12 o'clock)
+    languages.forEach(lang => {
+      const pct = lang.percentage || 0;
+      const angle = (pct / (totalPct || 1)) * Math.PI * 2;
+      const endAngle = startAngle + angle;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, canvas.height / 2);
+      ctx.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) / 2 - 4, startAngle, endAngle);
+      ctx.closePath();
+      ctx.fillStyle = lang.color || '#888888';
+      ctx.fill();
+      startAngle = endAngle;
+      // Add legend item
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="legend-color" style="background-color: ${lang.color || '#888888'};"></span>${lang.name} <span class="legend-percentage">${lang.percentage.toFixed(1)}%</span>`;
+      legend.appendChild(li);
+    });
   }
 
   /**
@@ -493,40 +438,25 @@ class GitHubActivity {
    */
   renderSkeleton() {
     this.container.innerHTML = `
-      <div class="github-activity__content">
-        <div class="activity__stats">
-          <div class="stat__item skeleton">
-            <div class="stat__number skeleton__text"></div>
-            <div class="stat__label skeleton__text"></div>
-          </div>
-          <div class="stat__item skeleton">
-            <div class="stat__number skeleton__text"></div>
-            <div class="stat__label skeleton__text"></div>
-          </div>
-          <div class="stat__item skeleton">
-            <div class="stat__number skeleton__text"></div>
-            <div class="stat__label skeleton__text"></div>
-          </div>
-          <div class="stat__item skeleton">
-            <div class="stat__number skeleton__text"></div>
-            <div class="stat__label skeleton__text"></div>
-          </div>
-        </div>
-        <div class="chart__section chart__section--full skeleton">
-          <div class="chart__title skeleton__text"></div>
-          <div class="chart__content skeleton__chart"></div>
-        </div>
-        <div class="chart__section chart__section--full skeleton">
-          <div class="chart__title skeleton__text"></div>
-          <div class="github-calendar-container skeleton__chart"></div>
-        </div>
-        <div class="chart__section chart__section--full skeleton">
-          <div class="year__selector">
-            ${this.availableYears.map(() => '<button class="year__button" disabled>----</button>').join('')}
-          </div>
-          <div class="activity__heatmap skeleton__heatmap"></div>
+      <div class="activity__stats">
+        <h3>Loading contributions…</h3>
+        <div class="stats__cards">
+          <div class="stats__card skeleton-card"></div>
+          <div class="stats__card skeleton-card"></div>
+          <div class="stats__card skeleton-card"></div>
         </div>
       </div>
+      <div class="activity__year-toggle skeleton-buttons">
+        ${this.availableYears.map(() => '<button class="year__button" disabled>----</button>').join('')}
+      </div>
+      <div class="activity__languages">
+        <h4>Top Languages</h4>
+        <div class="languages__chart-wrapper">
+          <div class="skeleton-chart"></div>
+          <ul class="languages__legend skeleton-legend"></ul>
+        </div>
+      </div>
+      <div class="activity__heatmap skeleton-heatmap"></div>
     `;
   }
 }
