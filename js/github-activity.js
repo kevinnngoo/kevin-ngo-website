@@ -326,15 +326,16 @@ class GitHubActivity {
     this.container.innerHTML = `
       <div class="github-activity__content">
         ${this.renderStats()}
-        <div class="activity__charts">
-          <div class="chart__section">
-            <h3>Top Languages</h3>
-            ${this.renderLanguagesChart()}
-          </div>
-          <div class="chart__section">
-            <h3>Contribution Activity</h3>
-            ${this.renderHeatmap()}
-          </div>
+        
+        <!-- Top Languages - Full Width -->
+        <div class="chart__section chart__section--full">
+          <h3 class="chart__title">Top Languages</h3>
+          ${this.renderLanguagesChart()}
+        </div>
+        
+        <!-- Contribution Activity - Full Width Below -->
+        <div class="chart__section chart__section--full">
+          ${this.renderHeatmap()}
         </div>
       </div>
     `;
@@ -390,8 +391,14 @@ class GitHubActivity {
               `).join('')}
             </div>
           </div>
-          <div id="contributionHeatmap" class="chart__content" role="img" aria-label="GitHub contribution heatmap">
-            <!-- Heatmap will be rendered here -->
+          <div class="heatmap__content">
+            <div id="contributionHeatmap" class="chart__content" role="img" aria-label="GitHub contribution heatmap">
+              <!-- Heatmap will be rendered here -->
+            </div>
+            <div class="heatmap__summary">
+              <span class="summary__text">Total contributions this year: <strong id="totalContributions">0</strong></span>
+              <span class="summary__text">Most active day: <strong id="mostActiveDay">-</strong></span>
+            </div>
           </div>
         </div>
       </div>

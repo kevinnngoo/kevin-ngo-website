@@ -211,29 +211,84 @@ window.GitHubCharts = (function() {
       // Clear container
       this.container.innerHTML = '';
 
-      // Create compact heatmap grid
-      const heatmapGrid = document.createElement('div');
-      heatmapGrid.className = 'heatmap-grid';
+      // Create GitHub-style heatmap
+      const heatmapContainer = document.createElement('div');
+      heatmapContainer.className = 'github-heatmap';
+      
+      // Create month labels
+      const monthLabels = document.createElement('div');
+      monthLabels.className = 'heatmap-months';
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      months.forEach(month => {
+        const monthLabel = document.createElement('span');
+        monthLabel.className = 'month-label';
+        monthLabel.textContent = month;
+        monthLabels.appendChild(monthLabel);
+      });
+      
+      // Create day labels
+      const dayLabels = document.createElement('div');
+      dayLabels.className = 'heatmap-days';
+      const days = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+      days.forEach(day => {
+        const dayLabel = document.createElement('span');
+        dayLabel.className = 'day-label';
+        dayLabel.textContent = day;
+        dayLabels.appendChild(dayLabel);
+      });
+      
+      // Create main grid container
+      const gridContainer = document.createElement('div');
+      gridContainer.className = 'heatmap-grid-container';
+      
+      // Add day labels to grid container
+      gridContainer.appendChild(dayLabels);
+      
+      // Create the actual contribution grid
+      const contributionGrid = document.createElement('div');
+      contributionGrid.className = 'heatmap-grid';
       
       // Filter data for selected year
       const yearData = this.getYearData(this.selectedYear);
       
-      // Create grid of contribution squares
-      yearData.forEach((day, index) => {
-        const cell = document.createElement('div');
-        cell.className = 'heatmap-cell';
-        cell.setAttribute('data-date', day.date);
-        cell.setAttribute('data-count', day.count);
-        cell.setAttribute('title', `${day.count} contributions on ${this.formatDate(day.date)}`);
+      // Group data by weeks (GitHub style)
+      const weeks = this.groupByWeeks(yearData);
+      
+      weeks.forEach(week => {
+        const weekColumn = document.createElement('div');
+        weekColumn.className = 'week-column';
         
-        // Set color intensity based on contribution count
-        const intensity = this.getIntensity(day.count);
-        cell.setAttribute('data-level', intensity);
+        week.forEach(day => {
+          const cell = document.createElement('div');
+          cell.className = 'heatmap-cell';
+          cell.setAttribute('data-date', day.date);
+          cell.setAttribute('data-count', day.count);
+          cell.setAttribute('title', `${day.count} contributions on ${this.formatDate(day.date)}`);
+          
+          // Set color intensity based on contribution count
+          const intensity = this.getIntensity(day.count);
+          cell.setAttribute('data-level', intensity);
+          
+          weekColumn.appendChild(cell);
+        });
         
-        heatmapGrid.appendChild(cell);
+        contributionGrid.appendChild(weekColumn);
       });
-
-      this.container.appendChild(heatmapGrid);
+      
+      gridContainer.appendChild(contributionGrid);
+      
+      // Assemble the heatmap
+      heatmapContainer.appendChild(monthLabels);
+      heatmapContainer.appendChild(gridContainer);
+      
+      // Add legend
+      const legend = this.createLegend();
+      heatmapContainer.appendChild(legend);
+      
+      this.container.appendChild(heatmapContainer);
+      
+      // Update summary stats
+      this.updateSummaryStats(yearData);
     }
 
     getYearData(year) {
@@ -272,6 +327,92 @@ window.GitHubCharts = (function() {
         month: 'short', 
         day: 'numeric' 
       });
+    }
+
+    groupByWeeks(yearData) {
+      const weeks = [];
+      let currentWeek = [];
+      
+      // Start from the first Sunday of the year or the year start
+      const yearStart = new Date(this.selectedYear, 0, 1);
+      const firstSunday = new Date(yearStart);
+      firstSunday.setDate(yearStart.getDate() - yearStart.getDay());
+      
+      // Generate 53 weeks of data
+      for (let week = 0; week < 53; week++) {
+        const weekData = [];
+        
+        for (let day = 0; day < 7; day++) {
+          const currentDate = new Date(firstSunday);
+          currentDate.setDate(firstSunday.getDate() + (week * 7) + day);
+          
+          const dateString = currentDate.toISOString().split('T')[0];
+          const existingData = yearData.find(item => item.date === dateString);
+          
+          // Only include days that are in the selected year
+          if (currentDate.getFullYear() === this.selectedYear) {
+            weekData.push({
+              date: dateString,
+              count: existingData ? existingData.count : 0,
+              weekday: currentDate.getDay()
+            });
+          } else {
+            // Add empty placeholder for days outside the year
+            weekData.push({
+              date: dateString,
+              count: 0,
+              weekday: currentDate.getDay(),
+              isEmpty: true
+            });
+          }
+        }
+        
+        weeks.push(weekData);
+      }
+      
+      return weeks;
+    }
+
+    createLegend() {
+      const legend = document.createElement('div');
+      legend.className = 'heatmap-legend';
+      
+      const lessLabel = document.createElement('span');
+      lessLabel.className = 'legend-label';
+      lessLabel.textContent = 'Less';
+      legend.appendChild(lessLabel);
+      
+      // Create color squares
+      for (let i = 0; i <= 4; i++) {
+        const square = document.createElement('div');
+        square.className = 'legend-square';
+        square.setAttribute('data-level', i);
+        legend.appendChild(square);
+      }
+      
+      const moreLabel = document.createElement('span');
+      moreLabel.className = 'legend-label';
+      moreLabel.textContent = 'More';
+      legend.appendChild(moreLabel);
+      
+      return legend;
+    }
+
+    updateSummaryStats(yearData) {
+      const totalContributions = yearData.reduce((sum, day) => sum + day.count, 0);
+      const mostActiveDay = yearData.reduce((max, day) => day.count > max.count ? day : max, { count: 0, date: '' });
+      
+      // Update DOM elements if they exist
+      const totalElement = document.getElementById('totalContributions');
+      const mostActiveElement = document.getElementById('mostActiveDay');
+      
+      if (totalElement) {
+        totalElement.textContent = totalContributions.toLocaleString();
+      }
+      
+      if (mostActiveElement && mostActiveDay.date) {
+        mostActiveElement.textContent = `${mostActiveDay.count} contributions on ${this.formatDate(mostActiveDay.date)}`;
+      }
     }
 
     setupYearToggle() {
