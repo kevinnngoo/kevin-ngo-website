@@ -268,131 +268,131 @@ class GitHubActivity {
   }
 
   /**
-   * Render the GitHub activity section.  Builds HTML for the stats,
-   * year toggle buttons and heatmap container, attaches event listeners and
-   * delegates heatmap rendering to the chart helper.
+   * Render stats section
    */
-  render() {
-    const year = this.selectedYear;
-    const data = this.yearData[year] || { totalCommits: 0, totalPRs: 0, totalIssues: 0, calendar: [], totalContributions: 0 };
-    const total = data.totalContributions;
-    // Construct the inner HTML using existing CSS classes for compatibility
-    this.container.innerHTML = `
-      <div class="github-activity__content">
+  renderStats() {
+    if (!this.data) {
+      return `
         <div class="activity__stats">
           <div class="stat__item">
-            <div class="stat__number">${total.toLocaleString()}</div>
-            <div class="stat__label">contributions in ${year}</div>
+            <div class="stat__number">-</div>
+            <div class="stat__label">Loading...</div>
           </div>
           <div class="stat__item">
-            <div class="stat__number">${(data.totalCommits || 0).toLocaleString()}</div>
-            <div class="stat__label">Commits</div>
+            <div class="stat__number">-</div>
+            <div class="stat__label">Loading...</div>
           </div>
           <div class="stat__item">
-            <div class="stat__number">${(data.totalPRs || 0).toLocaleString()}</div>
-            <div class="stat__label">Pull Requests</div>
+            <div class="stat__number">-</div>
+            <div class="stat__label">Loading...</div>
           </div>
           <div class="stat__item">
-            <div class="stat__number">${(data.totalIssues || 0).toLocaleString()}</div>
-            <div class="stat__label">Issues</div>
+            <div class="stat__number">-</div>
+            <div class="stat__label">Loading...</div>
           </div>
         </div>
+      `;
+    }
+
+    return `
+      <div class="activity__stats">
+        <div class="stat__item">
+          <div class="stat__number">${(this.data.totalContributions || 0).toLocaleString()}</div>
+          <div class="stat__label">Contributions in 2025</div>
+        </div>
+        <div class="stat__item">
+          <div class="stat__number">${(this.data.totalCommits || 0).toLocaleString()}</div>
+          <div class="stat__label">Commits</div>
+        </div>
+        <div class="stat__item">
+          <div class="stat__number">${(this.data.totalPRs || 0).toLocaleString()}</div>
+          <div class="stat__label">Pull Requests</div>
+        </div>
+        <div class="stat__item">
+          <div class="stat__number">${(this.data.totalIssues || 0).toLocaleString()}</div>
+          <div class="stat__label">Issues</div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Render the GitHub activity section using github-calendar.js library
+   */
+  render() {
+    if (!this.data) return;
+
+    this.container.innerHTML = `
+      <div class="github-activity__content">
+        ${this.renderStats()}
         
         <!-- Top Languages - Full Width -->
         <div class="chart__section chart__section--full">
           <h3 class="chart__title">Top Languages</h3>
-          <div id="languagesChart" class="chart__content"></div>
-        </div>
-        
-        <!-- GitHub Contributions Calendar -->
-        <div class="chart__section chart__section--full">
-          <h3 class="chart__title">GitHub Contributions Calendar</h3>
-          <div id="github-calendar" class="github-calendar-container">
-            Loading GitHub contributions...
+          <div class="chart__content">
+            <div id="languagesChart"></div>
           </div>
         </div>
         
-        <!-- Year Toggle and Contribution Activity -->
+        <!-- Contribution Activity - Full Width Below -->
         <div class="chart__section chart__section--full">
-          <div class="year__selector">
-            ${this.availableYears.map(y => `
-              <button class="year__button${y === year ? ' active' : ''}" data-year="${y}">${y}</button>
-            `).join('')}
+          <h3 class="chart__title">Contribution Activity</h3>
+          <div class="github-calendar-container">
+            <!-- GitHub Calendar will be rendered here -->
+            <div class="calendar">
+              Loading GitHub contributions...
+            </div>
           </div>
-          <div id="contributionHeatmap" class="activity__heatmap"></div>
         </div>
       </div>
     `;
-    
-    // Attach click handlers for year buttons.  When a new year is selected
-    // we simply update the state and re‑render the view.
-    this.container.querySelectorAll('.year__button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const yr = parseInt(btn.dataset.year);
-        if (yr !== this.selectedYear) {
-          this.selectedYear = yr;
-          this.render();
-        }
-      });
-    });
-    
-    // Draw the heatmap for the selected year.
-    this.renderHeatmap();
-    // Initialize languages chart placeholder
-    this.initializeLanguagesChart();
-    // Initialize GitHub Calendar widget
-    this.initializeGitHubCalendar();
+
+    // Initialize charts after DOM is ready
+    setTimeout(() => {
+      this.renderHeatmap();
+      this.initializeLanguagesChart();
+    }, 0);
   }
 
   /**
-   * Render the heatmap for the selected year.  If the custom SVG heatmap
-   * implementation is available on `window.GitHubCharts`, it will draw
-   * an interactive grid.  Otherwise, a simple text summary is shown.
+   * Initialize GitHub Calendar using github-calendar.js library
    */
   renderHeatmap() {
-    const year = this.selectedYear;
-    const data = this.yearData[year]?.calendar || [];
-    const container = document.getElementById('contributionHeatmap');
-    if (!container) {
-      console.warn('GitHubActivity: Heatmap container not found');
-      return;
-    }
-    
-    if (window.GitHubCharts && typeof window.GitHubCharts.ContributionHeatmap === 'function') {
-      // Clear previous contents before drawing
-      container.innerHTML = '';
-      try {
-        new window.GitHubCharts.ContributionHeatmap('contributionHeatmap', {
-          data: data,
-          year: year,
-          width: 800,
-          height: 150
-        });
-      } catch (error) {
-        console.error('Failed to render heatmap:', error);
-        this.renderHeatmapFallback(container, data);
+    // Initialize the GitHub calendar after DOM is ready
+    setTimeout(() => {
+      if (typeof GitHubCalendar !== 'undefined') {
+        try {
+          GitHubCalendar(".calendar", "kevinnngoo", {
+            responsive: true,
+            tooltips: true,
+            cache: 21600, // 6 hours cache
+            summary_text: "Summary of contributions made by kevinnngoo",
+            global_stats: true
+          });
+        } catch (error) {
+          console.error('Failed to load GitHub calendar:', error);
+          this.renderHeatmapFallback();
+        }
+      } else {
+        console.warn('GitHubCalendar library not loaded');
+        this.renderHeatmapFallback();
       }
-    } else {
-      this.renderHeatmapFallback(container, data);
-    }
+    }, 100);
   }
 
   /**
    * Render fallback heatmap display
    */
-  renderHeatmapFallback(container, data) {
-    const total = data.reduce((sum, d) => sum + (d.count || 0), 0);
-    const maxDay = data.reduce((max, d) => d.count > max.count ? d : max, { count: 0, date: '' });
-    
-    container.innerHTML = `
-      <div class="heatmap-fallback">
-        <p><strong>${total.toLocaleString()}</strong> total contributions</p>
-        ${maxDay.count > 0 ? `<p>Most active day: <strong>${maxDay.count}</strong> contributions on ${new Date(maxDay.date).toLocaleDateString()}</p>` : ''}
-        <div class="contribution-summary">
-          <span class="summary-text">Contribution data loaded (${data.length} days)</span>
+  renderHeatmapFallback() {
+    const container = document.querySelector('.calendar');
+    if (container) {
+      container.innerHTML = `
+        <div class="heatmap-fallback">
+          <p>Unable to load GitHub contribution calendar.</p>
+          <p>Please check your internet connection and try again.</p>
         </div>
-      </div>
-    `;
+      `;
+    }
   }
 
   /**
@@ -449,43 +449,7 @@ class GitHubActivity {
     `;
   }
 
-  /**
-   * Initialize the GitHub Calendar widget using the github-calendar library.
-   * This creates a beautiful contribution calendar with tooltips and responsive design.
-   */
-  initializeGitHubCalendar() {
-    // Check if GitHubCalendar is available
-    if (typeof GitHubCalendar !== 'function') {
-      console.warn('GitHubActivity: GitHubCalendar library not loaded');
-      const container = document.getElementById('github-calendar');
-      if (container) {
-        container.innerHTML = '<p>GitHub Calendar library not available</p>';
-      }
-      return;
-    }
 
-    try {
-      // Initialize the GitHub calendar with responsive design and tooltips
-      GitHubCalendar("#github-calendar", this.username, {
-        responsive: true,
-        tooltips: true,
-        cache: 21600, // Cache for 6 hours (same as our cache manager)
-        summary_text: `Summary of pull requests, issues opened, and commits made by ${this.username}`
-      }).catch(error => {
-        console.error('Failed to load GitHub calendar:', error);
-        const container = document.getElementById('github-calendar');
-        if (container) {
-          container.innerHTML = '<p>Unable to load GitHub contributions calendar</p>';
-        }
-      });
-    } catch (error) {
-      console.error('Error initializing GitHub calendar:', error);
-      const container = document.getElementById('github-calendar');
-      if (container) {
-        container.innerHTML = '<p>Error loading GitHub contributions calendar</p>';
-      }
-    }
-  }
 
   /**
    * Render a basic skeleton while data is loading.  This prevents layout

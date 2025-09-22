@@ -2039,3 +2039,75 @@ h2::after {
   padding: 2rem;
   color: var(--muted-text);
 }
+
+/* GitHub Calendar Styling */
+.github-calendar-container {
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+/* Override github-calendar.js default styles to match portfolio theme */
+.calendar {
+  font-family: var(--font-family);
+  color: var(--text-color);
+}
+
+.calendar .contrib-column {
+  fill: var(--bg-color);
+}
+
+.calendar .contrib-number {
+  fill: var(--text-color);
+}
+
+.calendar .contrib-footer {
+  color: var(--muted-text);
+  font-size: 0.85rem;
+}
+
+/* Contribution level colors - matching GitHub's green theme but with portfolio colors */
+.calendar rect.ContribCalendar-day[data-level="0"] {
+  fill: var(--bg-color);
+  stroke: var(--border-color);
+  stroke-width: 1px;
+}
+
+.calendar rect.ContribCalendar-day[data-level="1"] {
+  fill: rgba(64, 196, 99, 0.3);
+}
+
+.calendar rect.ContribCalendar-day[data-level="2"] {
+  fill: rgba(64, 196, 99, 0.5);
+}
+
+.calendar rect.ContribCalendar-day[data-level="3"] {
+  fill: rgba(64, 196, 99, 0.7);
+}
+
+.calendar rect.ContribCalendar-day[data-level="4"] {
+  fill: rgba(64, 196, 99, 1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .github-calendar-container {
+    padding: 0.5rem;
+  }
+  
+  .calendar {
+    font-size: 0.8rem;
+  }
+}
+
+/* Fallback styling */
+.heatmap-fallback {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted-text);
+  background: var(--card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
