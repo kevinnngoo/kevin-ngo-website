@@ -27,18 +27,16 @@ class GitHubActivity {
     this.container = document.getElementById(containerId);
     this.username = options.username || 'kevinnngoo';
     this.apiEndpoint = options.apiEndpoint || '/api/github-stats';
-    // Determine which years to show.  By default we include the current
-    // calendar year and the two preceding years.
+    // Determine which years to show.  Show 2023 and 2024 only to avoid showing
+    // zero contributions for 2025
     const currentYear = new Date().getFullYear();
-    this.availableYears = options.years || [currentYear - 2, currentYear - 1, currentYear];
+    this.availableYears = options.years || [2023, 2024];
     // Holds contribution data keyed by year.  Each entry has the shape
     // { totalCommits, totalPRs, totalIssues, calendar: [...], totalContributions }.
     this.yearData = {};
-    // The year currently selected for display.  If the current year is in
-    // availableYears use it; otherwise select the most recent year in the list.
-    this.selectedYear = this.availableYears.includes(currentYear)
-      ? currentYear
-      : this.availableYears[this.availableYears.length - 1];
+    // The year currently selected for display.  Default to 2024 as the most recent
+    // year with meaningful contribution data.
+    this.selectedYear = 2024;
 
     // Placeholder for language distribution.  The object structure is
     // { name: string, color: string, percentage: number }.  This data
