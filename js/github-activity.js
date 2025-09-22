@@ -64,16 +64,28 @@ class GitHubActivity {
    * populated.
    */
   async init() {
-    // Fetch the top languages once.  We do this first because it does not
-    // depend on the year and we want the information available for the
-    // initial render.  We deliberately do not await this call in order
-    // to overlap network latency with year data fetching.
-    this.fetchLanguages().catch(err => {
+    // Fetch the top languages first and wait for completion.  
+    // This ensures language data is available for the initial render.
+    try {
+      await this.fetchLanguages();
+    } catch (err) {
       console.error('GitHubActivity: failed to fetch languages', err);
-    });
+      // Set fallback language data if fetching fails
+      this.languages = [
+        { name: 'JavaScript', color: '#f1e05a', percentage: 40 },
+        { name: 'TypeScript', color: '#2b7489', percentage: 30 },
+        { name: 'HTML', color: '#e34c26', percentage: 15 },
+        { name: 'CSS', color: '#563d7c', percentage: 10 },
+        { name: 'Other', color: '#8A2BE2', percentage: 5 }
+      ];
+    }
+    
+    // Fetch year data for all available years
     for (const year of this.availableYears) {
       await this.fetchYearData(year);
     }
+    
+    // Now render with all data available
     this.render();
   }
 
