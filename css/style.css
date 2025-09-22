@@ -1552,6 +1552,82 @@ h2::after {
   }
 }
 
+/* Charts Layout */
+.activity__charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.chart__section {
+  background-color: var(--surface-color);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chart__section h3 {
+  color: var(--accent-light);
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.chart__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart__content {
+  position: relative;
+}
+
+/* Languages Chart Legend */
+.chart__legend {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legend__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend__label {
+  color: var(--text-color);
+}
+
+/* Responsive Charts */
+@media (max-width: 768px) {
+  .activity__charts {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .chart__section {
+    padding: 1.5rem;
+  }
+  
+  #languagesChart {
+    width: 250px !important;
+    height: 250px !important;
+  }
+}
+
 @media (max-width: 480px) {
   .github-activity {
     padding: 2rem 0;
