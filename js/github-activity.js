@@ -29,44 +29,30 @@ class GitHubActivity {
   async init() {
     console.log('GitHub Activity: Initializing component for user:', this.username);
     this.renderSkeleton();
-    console.log('GitHub Activity: Skeleton rendered, loading data...');
-    await this.loadData();
+    // Preload all years (2023, 2024, 2025)
+    this.availableYears = [2023, 2024, 2025];
+    this.yearData = {};
+    this.selectedYear = new Date().getFullYear();
+    for (const year of this.availableYears) {
+      await this.fetchYearData(year);
+    }
+    this.render();
   }
 
   /**
    * Load GitHub activity data with caching
    */
-  async loadData() {
-    console.log('GitHub Activity: Starting loadData for user:', this.username);
-    this.isLoading = true;
-    this.error = null;
-
+  async fetchYearData(year) {
     try {
-      // Check cache first
-      const cacheKey = this.username;
-      console.log('GitHub Activity: Checking cache for key:', cacheKey);
-      const cachedData = cacheManager.get(cacheKey);
-
-      if (cachedData) {
-        console.log('GitHub Activity: Using cached data');
-        this.data = cachedData;
-        this.render();
-        
-        // Still fetch fresh data in background for next time
-        this.fetchFreshData(cacheKey);
-        return;
-      }
-
-      console.log('GitHub Activity: No cache found, fetching fresh data...');
-      // No cache, fetch fresh data
-      await this.fetchFreshData(cacheKey);
-
+      const res = await fetch(`/api/github-stats.js?username=${this.username}&year=${year}`);
+      if (!res.ok) throw new Error(`Failed to fetch data for year ${year}`);
+      const data = await res.json();
+      this.yearData[year] = data.contributions;
+      // Use the first year loaded as the default for selectedYear if not set
+      if (!this.selectedYear) this.selectedYear = year;
     } catch (error) {
-      console.error('GitHub Activity: Error loading data:', error);
-      this.error = error.message;
-      this.renderError();
-    } finally {
-      this.isLoading = false;
+      console.error('GitHub Activity: Error fetching year data:', error);
+      this.yearData[year] = { totalCommits: 0, totalPRs: 0, totalIssues: 0, calendar: [] };
     }
   }
 
@@ -321,18 +307,16 @@ class GitHubActivity {
    * Render the main content
    */
   render() {
-    if (!this.data) return;
+    if (!this.yearData || !this.yearData[this.selectedYear]) return;
 
     this.container.innerHTML = `
       <div class="github-activity__content">
         ${this.renderStats()}
-        
         <!-- Top Languages - Full Width -->
         <div class="chart__section chart__section--full">
           <h3 class="chart__title">Top Languages</h3>
           ${this.renderLanguagesChart()}
         </div>
-        
         <!-- Contribution Activity - Full Width Below -->
         <div class="chart__section chart__section--full">
           ${this.renderHeatmap()}
@@ -344,6 +328,16 @@ class GitHubActivity {
     setTimeout(() => {
       this.initializeHeatmap();
       this.initializeLanguagesChart();
+      // Attach year toggle events
+      const yearBtns = document.querySelectorAll('.year__button');
+      yearBtns.forEach(btn => {
+        btn.onclick = (e) => {
+          yearBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.selectedYear = parseInt(btn.dataset.year);
+          this.render();
+        };
+      });
     }, 0);
   }
 
@@ -351,8 +345,7 @@ class GitHubActivity {
    * Render statistics section
    */
   renderStats() {
-    const { contributions } = this.data;
-    
+    const contributions = this.yearData[this.selectedYear] || { totalCommits: 0, totalPRs: 0, totalIssues: 0 };
     return `
       <div class="activity__stats">
         <div class="stat__item">
@@ -375,14 +368,10 @@ class GitHubActivity {
    * Render heatmap section
    */
   renderHeatmap() {
-    // Determine available years from data
-    const calendar = this.data.contributions.calendar;
-    const years = Array.from(new Set(calendar.map(day => new Date(day.date).getFullYear()))).sort();
-    const selectedYear = this.selectedYear || years[years.length - 1];
-    // Filter data for selected year
-    const yearData = calendar.filter(day => new Date(day.date).getFullYear() === selectedYear);
+    const years = this.availableYears;
+    const selectedYear = this.selectedYear;
+    const yearData = this.yearData[selectedYear]?.calendar || [];
     const totalContributions = yearData.reduce((sum, day) => sum + day.count, 0);
-
     return `
       <div class="activity__heatmap">
         <div class="chart__container">
@@ -414,18 +403,9 @@ class GitHubActivity {
    * Initialize heatmap after DOM is rendered
    */
   initializeHeatmap() {
-    // Find selected year from active button
-    const calendar = this.data.contributions.calendar;
-    const years = Array.from(new Set(calendar.map(day => new Date(day.date).getFullYear()))).sort();
-    let selectedYear = years[years.length - 1];
-    const activeBtn = document.querySelector('.year__button.active');
-    if (activeBtn) {
-      selectedYear = parseInt(activeBtn.dataset.year);
-      this.selectedYear = selectedYear;
-    }
-    const yearData = calendar.filter(day => new Date(day.date).getFullYear() === selectedYear);
+    const selectedYear = this.selectedYear;
+    const yearData = this.yearData[selectedYear]?.calendar || [];
     if (window.GitHubCharts) {
-      // Initialize contribution heatmap for selected year
       new window.GitHubCharts.ContributionHeatmap('contributionHeatmap', {
         data: yearData,
         width: 600,
@@ -433,19 +413,8 @@ class GitHubActivity {
         year: selectedYear
       });
     } else {
-      // Fallback to simple text if charts not loaded
       this.renderSimpleHeatmap();
     }
-    // Attach year toggle events
-    const yearBtns = document.querySelectorAll('.year__button');
-    yearBtns.forEach(btn => {
-      btn.onclick = (e) => {
-        yearBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        this.selectedYear = parseInt(btn.dataset.year);
-        this.render();
-      };
-    });
   }
 
   /**
