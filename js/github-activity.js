@@ -75,23 +75,57 @@ class GitHubActivity {
    */
   async fetchFreshData(cacheKey) {
     try {
-      console.log('GitHub Activity: Making API call to serverless endpoint...');
+      console.log('GitHub Activity: Making API calls to GitHub public API...');
       
-      // Use our serverless GraphQL API
-      const response = await fetch(`/api/github-stats?username=${this.username}`);
+      // Use GitHub's public REST API endpoints
+      const [userResponse, reposResponse, eventsResponse] = await Promise.all([
+        fetch(`https://api.github.com/users/${this.username}`),
+        fetch(`https://api.github.com/users/${this.username}/repos?sort=pushed&per_page=100`),
+        fetch(`https://api.github.com/users/${this.username}/events/public?per_page=100`)
+      ]);
 
-      console.log('GitHub Activity: API response received');
-      console.log('- Response status:', response.status);
+      console.log('GitHub Activity: API responses received');
+      console.log('- User response status:', userResponse.status);
+      console.log('- Repos response status:', reposResponse.status);
+      console.log('- Events response status:', eventsResponse.status);
 
-      if (!response.ok) {
-        const errorMsg = `GitHub API request failed with status: ${response.status}`;
+      if (!userResponse.ok || !reposResponse.ok || !eventsResponse.ok) {
+        const errorMsg = `GitHub API request failed: User: ${userResponse.status}, Repos: ${reposResponse.status}, Events: ${eventsResponse.status}`;
         console.error('GitHub Activity:', errorMsg);
         throw new Error(errorMsg);
       }
 
-      const normalizedData = await response.json();
-      console.log('GitHub Activity: Data received:', normalizedData); // Debug log
-      console.log('GitHub Activity: Calendar data length:', normalizedData.contributions?.calendar?.length); // Debug log
+      const [user, repos, events] = await Promise.all([
+        userResponse.json(),
+        reposResponse.json(),
+        eventsResponse.json()
+      ]);
+
+      console.log('GitHub Activity: Processing data...');
+      console.log('- Repos found:', repos.length);
+      console.log('- Events found:', events.length);
+
+      // Process events to get contribution stats
+      const contributions = this.processEvents(events);
+      
+      // Process repositories for language stats
+      const topLanguages = this.processLanguages(repos);
+
+      const normalizedData = {
+        contributions,
+        topLanguages,
+        user: {
+          name: user.name,
+          login: user.login,
+          avatar_url: user.avatar_url,
+          public_repos: user.public_repos
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('GitHub Activity: Data processed successfully');
+      console.log('- Contributions:', contributions);
+      console.log('- Top languages:', topLanguages);
 
       this.data = normalizedData;
       cacheManager.set(cacheKey, normalizedData);
@@ -111,6 +145,124 @@ class GitHubActivity {
         throw error;
       }
     }
+  }
+  /**
+   * Process GitHub events to get contribution statistics
+   */
+  processEvents(events) {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    let totalCommits = 0;
+    let totalPRs = 0;
+    let totalIssues = 0;
+    const calendar = [];
+
+    // Generate last 365 days for contribution calendar
+    for (let i = 364; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      calendar.push({
+        date: date.toISOString().split('T')[0],
+        count: 0,
+        weekday: date.getDay()
+      });
+    }
+
+    events.forEach(event => {
+      const eventDate = new Date(event.created_at);
+      if (eventDate >= oneYearAgo) {
+        const dateString = eventDate.toISOString().split('T')[0];
+        const calendarDay = calendar.find(day => day.date === dateString);
+        
+        if (calendarDay) {
+          calendarDay.count++;
+        }
+
+        switch (event.type) {
+          case 'PushEvent':
+            totalCommits += event.payload.commits ? event.payload.commits.length : 1;
+            break;
+          case 'PullRequestEvent':
+            if (event.payload.action === 'opened') {
+              totalPRs++;
+            }
+            break;
+          case 'IssuesEvent':
+            if (event.payload.action === 'opened') {
+              totalIssues++;
+            }
+            break;
+        }
+      }
+    });
+
+    return {
+      totalCommits,
+      totalPRs,
+      totalIssues,
+      calendar
+    };
+  }
+
+  /**
+   * Process repositories to get language statistics
+   */
+  processLanguages(repos) {
+    const languageCount = new Map();
+    let totalSize = 0;
+    
+    // Count languages from repositories (use size as weight)
+    repos.forEach(repo => {
+      if (repo.language && repo.size > 0) {
+        const currentCount = languageCount.get(repo.language) || 0;
+        languageCount.set(repo.language, currentCount + repo.size);
+        totalSize += repo.size;
+      }
+    });
+
+    // Convert to percentage-based array
+    const languages = Array.from(languageCount.entries())
+      .map(([name, size]) => ({
+        name,
+        color: this.getLanguageColor(name),
+        percentage: totalSize > 0 ? (size / totalSize) * 100 : 0,
+        size
+      }))
+      .sort((a, b) => b.percentage - a.percentage)
+      .slice(0, 8); // Top 8 languages
+
+    return languages;
+  }
+
+  /**
+   * Get color for programming language
+   */
+  getLanguageColor(language) {
+    const colors = {
+      'JavaScript': '#f1e05a',
+      'Python': '#3572A5',
+      'Java': '#b07219',
+      'TypeScript': '#2b7489',
+      'C++': '#f34b7d',
+      'C': '#555555',
+      'HTML': '#e34c26',
+      'CSS': '#563d7c',
+      'PHP': '#4F5D95',
+      'Ruby': '#701516',
+      'Go': '#00ADD8',
+      'Rust': '#dea584',
+      'Swift': '#ffac45',
+      'Kotlin': '#F18E33',
+      'C#': '#239120',
+      'Shell': '#89e051',
+      'Vue': '#2c3e50',
+      'React': '#61dafb',
+      'Dart': '#00B4AB',
+      'Jupyter Notebook': '#DA5B0B',
+      'Dockerfile': '#384d54'
+    };
+    return colors[language] || '#858585';
   }
 
 
@@ -174,13 +326,23 @@ class GitHubActivity {
     this.container.innerHTML = `
       <div class="github-activity__content">
         ${this.renderStats()}
-        ${this.renderHeatmap()}
+        <div class="activity__charts">
+          <div class="chart__section">
+            <h3>Top Languages</h3>
+            ${this.renderLanguagesChart()}
+          </div>
+          <div class="chart__section">
+            <h3>Contribution Activity</h3>
+            ${this.renderHeatmap()}
+          </div>
+        </div>
       </div>
     `;
 
-    // Initialize heatmap after DOM is ready
+    // Initialize charts after DOM is ready
     setTimeout(() => {
       this.initializeHeatmap();
+      this.initializeLanguagesChart();
     }, 0);
   }
 
@@ -267,6 +429,108 @@ class GitHubActivity {
     const calendar = this.data.contributions.calendar;
     const mostActive = calendar.reduce((max, day) => day.count > max.count ? day : max, { count: 0, date: '' });
     return mostActive.count > 0 ? `${mostActive.count} contributions on ${this.formatDate(mostActive.date)}` : 'No contributions yet';
+  }
+
+  /**
+   * Render languages chart HTML
+   */
+  renderLanguagesChart() {
+    return `
+      <div class="chart__container">
+        <div class="chart__content">
+          <canvas id="languagesChart" width="300" height="300"></canvas>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Initialize languages donut chart
+   */
+  initializeLanguagesChart() {
+    if (!this.data || !this.data.topLanguages || this.data.topLanguages.length === 0) {
+      console.log('No language data available');
+      return;
+    }
+
+    const canvas = document.getElementById('languagesChart');
+    if (!canvas) {
+      console.error('Languages chart canvas not found');
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    const languages = this.data.topLanguages.slice(0, 6); // Top 6 languages
+    
+    // Chart dimensions
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const outerRadius = 100;
+    const innerRadius = 60;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Calculate angles
+    let currentAngle = -Math.PI / 2; // Start at top
+    
+    languages.forEach((lang, index) => {
+      const sliceAngle = (lang.percentage / 100) * 2 * Math.PI;
+      
+      // Draw slice
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, outerRadius, currentAngle, currentAngle + sliceAngle);
+      ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+      ctx.closePath();
+      
+      ctx.fillStyle = lang.color;
+      ctx.fill();
+      
+      // Draw label
+      const labelAngle = currentAngle + sliceAngle / 2;
+      const labelRadius = (outerRadius + innerRadius) / 2;
+      const labelX = centerX + Math.cos(labelAngle) * labelRadius;
+      const labelY = centerY + Math.sin(labelAngle) * labelRadius;
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      if (lang.percentage > 5) { // Only show label if slice is big enough
+        ctx.fillText(`${lang.percentage.toFixed(1)}%`, labelX, labelY);
+      }
+      
+      currentAngle += sliceAngle;
+    });
+    
+    // Draw legend
+    this.drawLanguagesLegend(languages);
+  }
+
+  /**
+   * Draw legend for languages chart
+   */
+  drawLanguagesLegend(languages) {
+    const legendContainer = document.querySelector('.chart__section h3');
+    if (!legendContainer) return;
+    
+    const legend = document.createElement('div');
+    legend.className = 'chart__legend';
+    legend.innerHTML = languages.map(lang => `
+      <div class="legend__item">
+        <div class="legend__color" style="background-color: ${lang.color}"></div>
+        <span class="legend__label">${lang.name} (${lang.percentage.toFixed(1)}%)</span>
+      </div>
+    `).join('');
+    
+    // Insert legend after the chart
+    const chartSection = legendContainer.parentElement;
+    const existingLegend = chartSection.querySelector('.chart__legend');
+    if (existingLegend) {
+      existingLegend.remove();
+    }
+    chartSection.appendChild(legend);
   }
 
   /**
