@@ -1672,24 +1672,37 @@ h2::after {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
+  position: relative;
 }
 
 /* Override github-calendar library styles to match our theme */
 .github-calendar-container .calendar {
   font-family: inherit;
   color: var(--text-color);
+  position: relative;
 }
 
+/* Make sure the calendar container is positioned relative for absolute positioning */
+.github-calendar-container .calendar {
+  position: relative !important;
+}
+
+/* Style the contrib legend in bottom right corner */
 .github-calendar-container .calendar .contrib-legend {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.8rem;
-  color: var(--muted-text);
+  position: absolute !important;
+  bottom: -10px !important;
+  right: 0px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  margin: 0 !important;
+  padding: 0.5rem !important;
+  background-color: var(--surface-color) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-size: 0.8rem !important;
+  color: var(--muted-text) !important;
+  z-index: 10 !important;
 }
 
 .github-calendar-container .calendar .contrib-legend-item {
@@ -1779,13 +1792,27 @@ h2::after {
 /* Responsive Design */
 @media (max-width: 768px) {
   .stats__cards {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    max-width: 300px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    max-width: 100%;
+    margin: 0 auto;
   }
 
   .stats__card {
-    padding: 1.25rem;
+    padding: 1rem;
+    min-height: 80px;
+  }
+
+  .stats__card span {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Make text smaller and more compact on mobile */
+  .chart__title,
+  .activity__languages h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
   }
 
   .activity__stats {
@@ -2088,8 +2115,57 @@ h2::after {
   }
   
   #languagesChart {
-    width: 250px !important;
-    height: 250px !important;
+    width: 200px !important;
+    height: 200px !important;
+  }
+
+  /* Stack chart and legend vertically on mobile */
+  .languages__chart-wrapper {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  /* Make legend more mobile-friendly */
+  .languages__legend {
+    width: 100%;
+    max-width: 300px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .languages__legend li {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .legend-color {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Alternative: Simple list layout for languages */
+  .languages-fallback {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .language-item {
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .language-name {
+    font-size: 1rem;
+  }
+
+  .language-percentage {
+    font-size: 0.9rem;
+    font-weight: 700;
   }
 
   .heatmap__header {
@@ -2160,6 +2236,34 @@ h2::after {
 
   .chart__container {
     padding: 1rem;
+  }
+
+  /* Extra compact stats on very small screens */
+  .stats__cards {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    max-width: 280px;
+  }
+
+  .stats__card {
+    padding: 0.75rem;
+    min-height: 70px;
+  }
+
+  .stats__card span {
+    font-size: 1.1rem;
+  }
+
+  /* Stack legend items in single column on very small screens */
+  .languages__legend {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    max-width: 250px;
+  }
+
+  #languagesChart {
+    width: 180px !important;
+    height: 180px !important;
   }
 }
 
