@@ -414,37 +414,4 @@ document.addEventListener('DOMContentLoaded', () => {
     yearEl.textContent = new Date().getFullYear();
   }
 
-  // Initialize GitHub Activity component
-  setTimeout(() => {
-    console.log('Attempting to load GitHub Activity component...');
-    
-    import('./github-activity.js').then(module => {
-      console.log('GitHub Activity module loaded successfully');
-      const GitHubActivity = module.default;
-      console.log('Creating GitHub Activity instance...');
-      
-      window.githubActivity = new GitHubActivity('githubActivityContainer', {
-        username: 'kevinnngoo',
-        apiEndpoint: '/api/github-stats'
-      });
-      
-      console.log('GitHub Activity instance created');
-    }).catch(error => {
-      console.error('Failed to load GitHub Activity:', error);
-      // Show fallback message
-      const container = document.getElementById('githubActivityContainer');
-      if (container) {
-        container.innerHTML = `
-          <div class="github-activity__error">
-            <div class="error__icon">📊</div>
-            <div class="error__message">
-              <h3>GitHub Activity Unavailable</h3>
-              <p>Unable to load GitHub activity data at this time.</p>
-              <p><small>Error: ${error.message}</small></p>
-            </div>
-          </div>
-        `;
-      }
-    });
-  }, 100);
 });
