@@ -201,19 +201,6 @@ main > section.hero {
   color: var(--text);
 }
 
-.header__links li.resume-link a {
-  color: var(--accent);
-  padding: 0.5rem 1.1rem;
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  background: rgba(16, 185, 129, 0.08);
-}
-
-.header__links li.resume-link a:hover {
-  background: rgba(16, 185, 129, 0.18);
-  color: var(--text);
-}
-
 .header__toggle {
   display: none;
   width: 44px;
@@ -874,7 +861,7 @@ main > section:nth-of-type(even) .project-card__preview {
 
 .contact__links {
   max-width: 40rem;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 }
 
 .contact__links li {
@@ -894,10 +881,6 @@ main > section:nth-of-type(even) .project-card__preview {
   min-width: 6rem;
   color: var(--muted);
   font-size: var(--fs-small);
-}
-
-.contact__resume {
-  margin-bottom: 3rem;
 }
 
 .contact__form {
