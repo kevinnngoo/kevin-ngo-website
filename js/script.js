@@ -144,28 +144,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const projects = [
       {
         title: 'Fake News Detector',
-        status: 'Learning project · In progress',
+        status: 'Machine learning',
         description:
-          'An exploration of text analysis and API design using Python and Flask. ' +
-          'The current repository focuses on the backend; the frontend and ' +
-          'analysis model are still in development, so this is not a validated ' +
-          'fact-checking tool.',
-        url: 'https://github.com/kevinnngoo/ai_fake_news_detector',
-        tech: ['Python', 'Flask', 'MongoDB']
+          'Developed a machine-learning text classification pipeline using over ' +
+          '6,000 news articles, TF-IDF feature extraction, and a ' +
+          'PassiveAggressiveClassifier, achieving 92.8% accuracy during evaluation.',
+        url: 'https://github.com/kevinnngoo/ml-fake-news-detector',
+        tech: ['Python', 'scikit-learn', 'pandas', 'TF-IDF'],
+        metric: { value: '92.8%', label: 'accuracy during evaluation' }
       },
       {
-        title: 'Microblog',
-        status: 'Tutorial-based learning project',
+        title: 'Microblogging Web App',
+        status: 'Full-stack web app',
         description:
-          'A Flask app based on a tutorial that I used to practice common web ' +
-          'application features, including authentication, profiles, posts, ' +
-          'following, and a REST API.',
+          'Built a full-stack microblogging application with user ' +
+          'authentication, CRUD functionality, pagination, relational database ' +
+          'models, and database migrations.',
         url: 'https://github.com/kevinnngoo/microblog',
         tech: ['Python', 'Flask', 'SQLAlchemy', 'Bootstrap']
       },
       {
         title: "Conway's Game of Life",
-        status: 'Learning project',
+        status: 'Python practice',
         description:
           'A small terminal simulation of Conway’s Game of Life. I built it ' +
           'to practice Python loops, conditionals, 2D lists, and updating a ' +
@@ -179,9 +179,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = document.createElement('article');
       card.className = 'project-card reveal';
 
-      const preview = project.image
-        ? `<img src="${project.image}" alt="${project.imageAlt || ''}" loading="lazy" />`
-        : `<div class="project-card__icon" aria-hidden="true">${getProjectIconSVG(project.title)}</div>`;
+      let preview;
+      if (project.metric) {
+        preview = `<div class="project-card__metric"><strong>${project.metric.value}</strong><span>${project.metric.label}</span></div>`;
+      } else if (project.image) {
+        preview = `<img src="${project.image}" alt="${project.imageAlt || ''}" loading="lazy" />`;
+      } else {
+        preview = `<div class="project-card__icon" aria-hidden="true">${getProjectIconSVG(project.title)}</div>`;
+      }
 
       card.innerHTML = `
         <div class="project-card__preview">${preview}</div>
