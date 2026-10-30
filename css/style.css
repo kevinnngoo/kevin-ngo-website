@@ -14,6 +14,15 @@
   --container: 1120px;
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
+  --font-heading: "Manrope", "Inter", system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-heavy: 800;
+  --fs-body: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --fs-small: 0.875rem;
 }
 
 *,
@@ -32,9 +41,16 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: 1rem;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
 }
 
 img {
@@ -57,7 +73,10 @@ h1,
 h2,
 h3,
 h4 {
-  line-height: 1.2;
+  font-family: var(--font-heading);
+  font-weight: var(--fw-bold);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -121,8 +140,8 @@ main > section.hero {
   align-items: baseline;
   gap: 0.9rem;
   font-size: clamp(1.6rem, 3vw, 2.1rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.02em;
   margin-bottom: 2.5rem;
 }
 
@@ -358,16 +377,19 @@ main > section.hero {
 }
 
 .hero h1 {
-  font-size: clamp(2.8rem, 7vw, 4.75rem);
-  font-weight: 800;
+  font-size: clamp(2.6rem, 7vw, 4.5rem);
+  font-weight: var(--fw-heavy);
+  line-height: 1.08;
   letter-spacing: -0.03em;
   margin-bottom: 0.75rem;
 }
 
 .hero__role {
+  font-family: var(--font-heading);
   color: #d4d4d8;
-  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
-  font-weight: 500;
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  font-weight: var(--fw-semibold);
+  line-height: 1.35;
   margin-bottom: 1.5rem;
 }
 
@@ -712,7 +734,8 @@ main > section:nth-of-type(even) .project-card__preview {
 .education__content h4 {
   color: #d4d4d8;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
   margin-bottom: 1rem;
 }
 
