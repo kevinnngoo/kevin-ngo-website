@@ -5,7 +5,7 @@ theme with green accents and adapts to mobile and desktop screens.
 
 ## Features
 
-- About, selected projects, technical focus, education, and contact sections
+- Sticky navigation, hero, about, professional experience, selected projects, technical skills, education, and contact sections
 - Curated project descriptions that identify learning and in-progress work
 - Responsive layout and keyboard-accessible mobile navigation
 - Contact form that prepares an email in the visitor's email client
