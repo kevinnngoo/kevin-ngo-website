@@ -70,6 +70,14 @@ function getProjectIconSVG(repoName) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Sticky header gets a background once the page scrolls
+  const header = document.querySelector('.header');
+  const updateHeader = () => {
+    if (header) header.classList.toggle('is-scrolled', window.scrollY > 8);
+  };
+  updateHeader();
+  window.addEventListener('scroll', updateHeader, { passive: true });
+
   // Mobile navigation drawer
   const openMenuBtn = document.getElementById('openMenu');
   const closeMenuBtn = document.getElementById('closeMenu');
@@ -169,27 +177,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     projects.forEach((project) => {
       const card = document.createElement('article');
-      card.className = 'project-card';
+      card.className = 'project-card reveal';
+
+      const preview = project.image
+        ? `<img src="${project.image}" alt="${project.imageAlt || ''}" loading="lazy" />`
+        : `<div class="project-card__icon" aria-hidden="true">${getProjectIconSVG(project.title)}</div>`;
 
       card.innerHTML = `
-        <div class="project-card__icon project-card__icon--badge" aria-hidden="true">
-          ${getProjectIconSVG(project.title)}
-        </div>
-        <h3>${project.title}</h3>
-        <p class="project-card__status">${project.status}</p>
-        <p>${project.description}</p>
-        <div class="tech-list">
-          ${project.tech
-            .map((technology) => `<span>${technology}</span>`)
-            .join('')}
-        </div>
-        <div class="project-card__links">
-          <a
-            href="${project.url}"
-            class="project-link"
-            target="_blank"
-            rel="noopener noreferrer"
-          >View source</a>
+        <div class="project-card__preview">${preview}</div>
+        <div class="project-card__body">
+          <p class="project-card__status">${project.status}</p>
+          <h3>${project.title}</h3>
+          <p>${project.description}</p>
+          <ul class="tech-list">
+            ${project.tech.map((technology) => `<li>${technology}</li>`).join('')}
+          </ul>
+          <div class="project-card__links">
+            <a
+              href="${project.url}"
+              class="project-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >View source<span aria-hidden="true"> →</span></a>
+          </div>
         </div>
       `;
 
@@ -198,6 +208,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Contact form submission with enhanced validation and user experience
+  const revealTargets = document.querySelectorAll(
+    '.section__title, .about__body, .experience-card, .skill-group, .education__item, .contact__form, .project-card'
+  );
+  revealTargets.forEach((element) => element.classList.add('reveal'));
+  if ('IntersectionObserver' in window) {
+    document.documentElement.classList.add('js-reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    revealTargets.forEach((element) => observer.observe(element));
+  } else {
+    revealTargets.forEach((element) => element.classList.add('is-visible'));
+  }
+
   const contactForm = document.getElementById('contactForm');
   const formStatus = document.getElementById('formStatus');
   if (contactForm) {

@@ -147,8 +147,9 @@
       <nav aria-label="Mobile navigation">
         <ul class="mobile-menu__nav">
           <li><a href="#about">About</a></li>
+          <li><a href="#experience">Experience</a></li>
           <li><a href="#projects">Projects</a></li>
-          <li><a href="#technical-focus">Technical Focus</a></li>
+          <li><a href="#technical-skills">Technical Skills</a></li>
           <li><a href="#education">Education</a></li>
           <li><a href="#contact">Contact</a></li>
           <li><a href="./resume.pdf" download>Resume</a></li>
@@ -169,8 +170,9 @@
         <nav class="header__nav" role="navigation" aria-label="Main navigation">
           <ul class="header__links">
             <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
             <li><a href="#projects">Projects</a></li>
-            <li><a href="#technical-focus">Technical Focus</a></li>
+            <li><a href="#technical-skills">Technical Skills</a></li>
             <li><a href="#education">Education</a></li>
             <li><a href="#contact">Contact</a></li>
             <li class="resume-link">
@@ -195,19 +197,21 @@
 
     <main id="main-content" role="main">
       <!-- Hero section -->
-      <section class="hero">
-        <!-- Background decorative image -->
-        <img
-          src="./images/hero-bg.png"
-          alt=""
-          class="hero__bg"
-          loading="lazy"
-          role="presentation"
-        />
+      <section class="hero" aria-labelledby="hero-title">
         <div class="hero__content">
           <div class="hero__text">
-            <h1>Kevin Ngo</h1>
-            <p>Programmer/Analyst at MEDITECH</p>
+            <p class="hero__eyebrow">Hello, I'm Kevin</p>
+            <h1 id="hero-title">Kevin Ngo.</h1>
+            <p class="hero__role">Programmer/Analyst at MEDITECH</p>
+            <p class="hero__description">
+              I work with healthcare software and enjoy building practical
+              solutions through programming, problem-solving, and continuous
+              learning.
+            </p>
+            <div class="hero__actions">
+              <a href="#projects" class="btn btn--primary">View Projects</a>
+              <a href="./resume.pdf" class="btn btn--ghost" download>Resume</a>
+            </div>
             <div class="hero__icons">
               <a
                 href="https://github.com/kevinnngoo"
@@ -279,7 +283,8 @@
       <!-- About section -->
       <section id="about" class="about">
         <div class="section__container">
-          <h2>About Me</h2>
+          <h2 class="section__title"><span class="section__kicker">01</span>About Me</h2>
+          <div class="about__body">
           <p>
             Hi, I'm Kevin! I'm currently a Programmer/Analyst at MEDITECH, where
             I work with healthcare software, troubleshoot technical challenges,
@@ -304,13 +309,38 @@
             Outside of work, I enjoy fitness, reading, gaming, and exploring
             new interests that help me grow personally and professionally.
           </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Experience section -->
+      <section id="experience" class="experience">
+        <div class="section__container">
+          <h2 class="section__title"><span class="section__kicker">02</span>Professional Experience</h2>
+          <article class="experience-card">
+            <div class="experience-card__header">
+              <div>
+                <h3>Programmer/Analyst</h3>
+                <p class="experience-card__company">MEDITECH</p>
+              </div>
+              <p class="experience-card__badge">Current role</p>
+            </div>
+            <ul class="experience-card__list">
+              <li>Work with healthcare software.</li>
+              <li>Troubleshoot technical challenges.</li>
+              <li>
+                Develop solutions that support clients and improve system
+                functionality.
+              </li>
+            </ul>
+          </article>
         </div>
       </section>
 
       <!-- Projects section -->
       <section id="projects" class="projects">
         <div class="section__container">
-          <h2>Selected Projects</h2>
+          <h2 class="section__title"><span class="section__kicker">03</span>Selected Projects</h2>
           <p class="projects__intro">
             These personal projects are opportunities to practice, experiment,
             and learn. Each description notes what it does and where it stands.
@@ -322,39 +352,47 @@
       </section>
 
       <!-- Technical focus section -->
-      <section id="technical-focus" class="expertise">
+      <section id="technical-skills" class="skills">
         <div class="section__container">
-          <h2>Technical Focus</h2>
-          <div class="expertise__cards">
-            <article class="expertise-card">
-              <h3>Python</h3>
-              <p>
-                My strongest language. I use it to explore application
-                development, scripting, and data-focused projects.
-              </p>
-              <div class="tech-list" aria-label="Python tools">
-                <span>Python</span><span>Flask</span><span>Pandas</span>
-              </div>
+          <h2 class="section__title"><span class="section__kicker">04</span>Technical Skills</h2>
+          <p class="skills__intro">
+            Python is my strongest language. I'm also interested in web
+            development, automation, and AI, and I keep learning through
+            small, clearly scoped projects.
+          </p>
+          <div class="skills__grid">
+            <article class="skill-group">
+              <h3>Languages</h3>
+              <ul class="tech-list">
+                <li class="is-primary">Python</li>
+                <li>JavaScript</li>
+                <li>HTML/CSS</li>
+              </ul>
             </article>
-            <article class="expertise-card">
-              <h3>Web development</h3>
-              <p>
-                I enjoy learning how interfaces and backend services work
-                together, and building projects that let me practice both.
-              </p>
-              <div class="tech-list" aria-label="Web development tools">
-                <span>JavaScript</span><span>React</span><span>PostgreSQL</span>
-              </div>
+            <article class="skill-group">
+              <h3>Frameworks &amp; Libraries</h3>
+              <ul class="tech-list">
+                <li>Flask</li>
+                <li>React</li>
+                <li>SQLAlchemy</li>
+                <li>Pandas</li>
+                <li>scikit-learn</li>
+                <li>Bootstrap</li>
+              </ul>
             </article>
-            <article class="expertise-card">
-              <h3>Automation &amp; AI</h3>
-              <p>
-                I’m interested in practical automation and exploring AI through
-                small, clearly scoped experiments.
-              </p>
-              <div class="tech-list" aria-label="Automation and AI tools">
-                <span>Automation</span><span>scikit-learn</span>
-              </div>
+            <article class="skill-group">
+              <h3>Databases</h3>
+              <ul class="tech-list">
+                <li>PostgreSQL</li>
+                <li>MongoDB</li>
+              </ul>
+            </article>
+            <article class="skill-group">
+              <h3>Tools</h3>
+              <ul class="tech-list">
+                <li>Git</li>
+                <li>GitHub</li>
+              </ul>
             </article>
           </div>
         </div>
@@ -363,7 +401,7 @@
       <!-- Education section -->
       <section id="education" class="education">
         <div class="section__container">
-          <h2>Education</h2>
+          <h2 class="section__title"><span class="section__kicker">05</span>Education</h2>
           <div class="education__item">
             <div class="education__icon" aria-hidden="true">
               <svg
@@ -401,7 +439,7 @@
       <!-- Contact section -->
       <section id="contact" class="contact">
         <div class="section__container">
-          <h2>Contact</h2>
+          <h2 class="section__title"><span class="section__kicker">06</span>Contact</h2>
           <p>
             If you’d like to get in touch, please send me a message using the
             form below.
