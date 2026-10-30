@@ -33,6 +33,10 @@ html {
   scroll-behavior: smooth;
 }
 
+main section[id] {
+  scroll-margin-top: calc(var(--nav-height) + 1rem);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -63,6 +67,11 @@ a {
 a:hover,
 a:focus {
   color: var(--accent-light);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-light);
+  outline-offset: 3px;
 }
 
 /* ============================================================
@@ -169,8 +178,9 @@ a:focus {
   display: none;
   flex-direction: column;
   justify-content: space-between;
-  width: 24px;
-  height: 18px;
+  width: 44px;
+  height: 44px;
+  padding: 13px 10px;
   background: none;
   border: none;
   cursor: pointer;
@@ -187,6 +197,21 @@ a:focus {
 /* ============================================================
    5. MOBILE NAVIGATION
    ============================================================ */
+.mobile-menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1190;
+  background: rgba(0, 0, 0, 0.65);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu__backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
 .mobile-menu {
   position: fixed;
   top: 0;
@@ -194,6 +219,7 @@ a:focus {
   width: 80vw;
   max-width: 320px;
   height: 100vh;
+  height: 100dvh;
   background-color: var(--surface-color);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
   transform: translateX(-100%);
@@ -222,6 +248,10 @@ a:focus {
 }
 
 .mobile-menu__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
   background: none;
   border: none;
   color: var(--text-color);
@@ -315,7 +345,7 @@ a:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent);
+  color: var(--accent-light);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -350,6 +380,12 @@ section {
   max-width: 1000px;
   margin: 0 auto;
   padding: 0 1rem;
+}
+
+.projects__intro {
+  max-width: 65ch;
+  margin-bottom: 1.5rem;
+  color: var(--muted-text);
 }
 
 h2 {
@@ -450,15 +486,33 @@ h2::after {
   margin-bottom: 0.75rem;
 }
 
+.project-card .project-card__status {
+  flex-grow: 0;
+  margin-bottom: 0.5rem;
+  color: var(--accent-light);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.project-card .tech-list {
+  margin-top: 0;
+}
+
+.project-card__links {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
 .project-card a.project-link {
   align-self: flex-start;
-  color: var(--accent);
+  color: var(--accent-light);
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .project-card a.project-link:hover {
-  color: var(--accent-light);
+  color: #fff;
 }
 
 /* ============================================================
@@ -500,7 +554,8 @@ h2::after {
 
 .contact__field input:focus,
 .contact__field textarea:focus {
-  outline: none;
+  outline: 2px solid var(--accent-light);
+  outline-offset: 2px;
   border-color: var(--accent);
 }
 
@@ -543,7 +598,7 @@ h2::after {
   /* Contact form feedback styles */
   font-size: 1rem;
   margin-top: 0.75rem;
-  color: #16764C;
+  color: var(--accent-light);
   font-weight: 600;
   transition: color 0.2s;
 }
@@ -585,7 +640,7 @@ h2::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent);
+  color: var(--accent-light);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -775,6 +830,21 @@ h2::after {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ============================================================
    12. EXPERTISE SECTION
    ============================================================
@@ -802,7 +872,7 @@ h2::after {
 }
 
 .expertise-card__icon {
-  color: var(--accent);
+  color: var(--accent-light);
   margin-bottom: 1rem;
   transition: transform 0.2s ease;
 }
@@ -830,7 +900,7 @@ h2::after {
   padding: 0.2rem 0.7rem;
   border-radius: 12px;
   border: 1px solid var(--accent);
-  color: var(--accent);
+  color: var(--accent-light);
   white-space: nowrap;
 }
 
@@ -947,7 +1017,7 @@ h2::after {
   font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--accent);
+  color: var(--accent-light);
   font-style: italic;
 }
 
@@ -1006,7 +1076,7 @@ h2::after {
   margin: 0.2rem 0 0.6rem;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-light);
   font-style: italic;
 }
 
@@ -1118,7 +1188,7 @@ h2::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent);
+  color: var(--accent-light);
   margin-bottom: 0.75rem;
 }
 

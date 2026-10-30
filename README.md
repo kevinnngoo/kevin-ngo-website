@@ -1,167 +1,36 @@
-# Kevin Ngo Portfolio Website
+# Kevin Ngo Portfolio
 
-Personal portfolio website showcasing my projects and skills, featuring dynamic GitHub activity integration.
+A personal portfolio built with plain HTML, CSS, and JavaScript. It uses a dark
+theme with green accents and adapts to mobile and desktop screens.
 
 ## Features
 
-- 📊 **GitHub Activity Dashboard** - Real-time GitHub statistics with contribution heatmap and language breakdown
-- 🎨 **Custom SVG Charts** - Donut charts and heatmaps built with pure SVG (no external libraries)
-- 💾 **Smart Caching** - 6-hour localStorage cache with graceful fallbacks
-- ♿ **Accessibility First** - ARIA labels, keyboard navigation, and screen reader support
-- 📱 **Responsive Design** - Optimized for all device sizes
-- ⚡ **Performance Optimized** - Serverless API with efficient data fetching
+- About, selected projects, technical focus, education, and contact sections
+- Curated project descriptions that identify learning and in-progress work
+- Responsive layout and keyboard-accessible mobile navigation
+- Contact form that prepares an email in the visitor's email client
 
-## GitHub Activity Section
+## Run locally
 
-The portfolio includes a comprehensive GitHub Activity section that displays:
+Open `index.html` in a browser. The portfolio does not require a build step or
+third-party JavaScript dependencies.
 
-- **Contribution Statistics** - Total commits, pull requests, and issues
-- **Language Distribution** - Interactive donut chart of programming languages used
-- **Contribution Heatmap** - 12-month GitHub contribution calendar
-- **Recent Repositories** - Latest 6 repositories with stars and language information
+## Project structure
 
-### Technical Implementation
+- `index.html` — page content and metadata
+- `css/style.css` — layout, colors, and responsive styles
+- `js/script.js` — mobile navigation, project cards, and contact form behavior
+- `images/` — portfolio images and project artwork
 
-- **Backend**: Serverless function (`/api/github-stats`) using GitHub GraphQL API
-- **Frontend**: Vanilla JavaScript with ES6 modules
-- **Charts**: Custom SVG-based visualizations
-- **Caching**: localStorage with 6-hour expiration
-- **Fallbacks**: Graceful degradation when API is unavailable
+The project cards are intentionally maintained in `js/script.js` so their
+selection and descriptions stay deliberate rather than being chosen by live
+repository activity.
 
-## Deployment
+## Deploy
 
-### Environment Variables
-
-The GitHub Activity feature requires a GitHub Personal Access Token:
-
-1. Create a GitHub Personal Access Token:
-   - Go to GitHub Settings → Developer settings → Personal access tokens
-   - Generate a new token with `public_repo` and `read:user` scopes
-   - Copy the token
-
-2. Set the environment variable:
-   ```bash
-   # For Vercel deployment
-   GITHUB_TOKEN=your_github_token_here
-   ```
-
-### Vercel Deployment
-
-1. **Fork or clone this repository**
-
-2. **Connect to Vercel**:
-   - Import your repository to Vercel
-   - Configure the environment variable `GITHUB_TOKEN`
-
-3. **Deploy**:
-   - Vercel will automatically deploy your site
-   - The serverless API will be available at `/api/github-stats`
-
-### Local Development
-
-1. **Install Vercel CLI**:
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Set up environment**:
-   ```bash
-   # Create .env.local file
-   echo "GITHUB_TOKEN=your_token_here" > .env.local
-   ```
-
-3. **Run locally**:
-   ```bash
-   vercel dev
-   ```
-
-4. **Run tests**:
-   ```bash
-   # Open tests/github-activity.test.js in browser
-   # Or run with Node.js
-   node tests/github-activity.test.js
-   ```
-
-## API Endpoints
-
-### GET /api/github-stats
-
-Fetches GitHub activity data for a user.
-
-**Parameters**:
-- `username` (optional) - GitHub username (defaults to 'kevinnngoo')
-
-**Response**:
-```json
-{
-  "contributions": {
-    "totalCommits": 1234,
-    "totalPRs": 56,
-    "totalIssues": 78,
-    "calendar": [
-      {
-        "date": "2024-01-01",
-        "count": 5,
-        "weekday": 1
-      }
-    ]
-  },
-  "topLanguages": [
-    {
-      "name": "JavaScript",
-      "color": "#f1e05a",
-      "percentage": 45.2
-    }
-  ],
-  "repos": [
-    {
-      "name": "portfolio-website",
-      "description": "Personal portfolio website",
-      "url": "https://github.com/kevinnngoo/portfolio-website",
-      "stars": 12,
-      "language": {
-        "name": "JavaScript",
-        "color": "#f1e05a"
-      },
-      "pushedAt": "2024-01-15T10:30:00Z"
-    }
-  ],
-  "timestamp": "2024-01-15T10:30:00Z"
-}
-```
-
-## Architecture
-
-```
-├── api/
-│   └── github-stats.js          # Serverless GraphQL proxy
-├── js/
-│   ├── script.js                # Main application logic
-│   ├── github-activity.js       # GitHub activity component
-│   ├── github-charts.js         # SVG chart implementations
-│   └── cache-manager.js         # localStorage cache utility
-├── css/
-│   └── style.css                # Styles with GitHub activity section
-├── tests/
-│   └── github-activity.test.js  # Unit tests for language aggregation
-└── vercel.json                  # Vercel deployment configuration
-```
-
-## Browser Support
-
-- Modern browsers with ES6 module support
-- Graceful fallback for older browsers (simple text lists instead of charts)
-- Progressive enhancement approach
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests: `node tests/github-activity.test.js`
-5. Submit a pull request
+The portfolio can be published as a static site by hosting the repository's
+files and serving `index.html` from the site root.
 
 ## License
 
-MIT License - feel free to use this code for your own portfolio!
-
+MIT License.

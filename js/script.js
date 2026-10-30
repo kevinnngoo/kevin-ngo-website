@@ -1,7 +1,5 @@
 // Kevin Ngo Portfolio Script
-// Handles mobile navigation toggling, dynamic project loading from GitHub and
-// contact form submission via mailto link. All external calls are made from
-// client‑side JavaScript.
+// Handles the mobile navigation, curated project cards, and contact form.
 
 function getProjectIconSVG(repoName) {
   const name = (repoName || "").toLowerCase();
@@ -72,236 +70,131 @@ function getProjectIconSVG(repoName) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Mobile menu toggle
+  // Mobile navigation drawer
   const openMenuBtn = document.getElementById('openMenu');
   const closeMenuBtn = document.getElementById('closeMenu');
   const mobileMenu = document.getElementById('mobileMenu');
-  if (openMenuBtn && closeMenuBtn && mobileMenu) {
+  const menuBackdrop = document.getElementById('mobileMenuBackdrop');
+  const backgroundElements = [
+    document.querySelector('.skip-nav'),
+    document.querySelector('.header'),
+    document.getElementById('main-content'),
+    document.querySelector('.footer')
+  ].filter(Boolean);
+  if (openMenuBtn && closeMenuBtn && mobileMenu && menuBackdrop) {
+    const closeMenu = () => {
+      mobileMenu.classList.remove('open');
+      menuBackdrop.classList.remove('open');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      mobileMenu.setAttribute('inert', '');
+      backgroundElements.forEach((element) => element.removeAttribute('inert'));
+      openMenuBtn.setAttribute('aria-expanded', 'false');
+      openMenuBtn.focus();
+    };
+
     openMenuBtn.addEventListener('click', () => {
       mobileMenu.classList.add('open');
+      menuBackdrop.classList.add('open');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      mobileMenu.removeAttribute('inert');
+      backgroundElements.forEach((element) => element.setAttribute('inert', ''));
+      openMenuBtn.setAttribute('aria-expanded', 'true');
+      closeMenuBtn.focus();
     });
-    closeMenuBtn.addEventListener('click', () => {
-      mobileMenu.classList.remove('open');
+    closeMenuBtn.addEventListener('click', closeMenu);
+    menuBackdrop.addEventListener('click', closeMenu);
+    mobileMenu.addEventListener('click', (event) => {
+      if (event.target.closest('a')) closeMenu();
     });
-    // Also close menu on outside click
-    mobileMenu.addEventListener('click', (e) => {
-      if (e.target === mobileMenu) {
-        mobileMenu.classList.remove('open');
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && mobileMenu.classList.contains('open')) {
+        closeMenu();
+        return;
+      }
+
+      if (event.key === 'Tab' && mobileMenu.classList.contains('open')) {
+        const focusableElements = mobileMenu.querySelectorAll(
+          'button:not([disabled]), a[href]'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey && document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        } else if (!event.shiftKey && document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
       }
     });
   }
 
-  // Fetch and display projects
+  // Render a curated project list so project descriptions and ordering stay intentional.
   const projectsGrid = document.getElementById('projectsGrid');
   if (projectsGrid) {
-    // Define a fallback list of projects based on your résumé. This list will be
-    // used if live data from GitHub cannot be retrieved (e.g. when viewing the
-    // file locally or if the API request fails). Feel free to add or update
-    // entries as you publish more repositories.
-    const fallbackProjects = [
+    const projects = [
       {
         title: 'Fake News Detector',
-        description: 'Machine learning project that classifies news articles as REAL or FAKE using natural language processing and a PassiveAggressiveClassifier.',
-        language: 'Python',
-        stars: 0,
+        status: 'Learning project · In progress',
+        description:
+          'An exploration of text analysis and API design using Python and Flask. ' +
+          'The current repository focuses on the backend; the frontend and ' +
+          'analysis model are still in development, so this is not a validated ' +
+          'fact-checking tool.',
         url: 'https://github.com/kevinnngoo/ai_fake_news_detector',
-        tech: ['Python', 'scikit-learn', 'NLP'],
-        demo: ''
-      },
-      {
-        title: 'Apartment Hunting Bot',
-        description: 'Python bot that scrapes Boston apartment listings, filters by rent and number of bedrooms, and sends daily email alerts with matching results.',
-        language: 'Python',
-        stars: 0,
-        url: 'https://github.com/kevinnngoo/apartment_hunting_bot',
-        tech: ['Python', 'BeautifulSoup', 'Email'],
-        demo: ''
-      },
-      {
-        title: 'Expense Tracker Application',
-        description: 'Full‑stack web application built with the MERN stack for tracking, categorizing and visualizing personal expenses in real time.',
-        language: 'JavaScript',
-        stars: 0,
-        url: 'https://github.com/kevinnngoo',
-        tech: ['MongoDB', 'Express', 'React', 'Node.js'],
-        demo: ''
-      },
-      {
-        title: "Conway's Game of Life",
-        description: "A terminal-based implementation of Conway’s Game of Life written in Python. This project simulates the evolution of cellular patterns using simple rules, random starting states, and an animated display in the terminal. Built as a beginner-friendly project to practice loops, conditionals, and 2D list manipulation for hands-on learning.",
-        language: 'Python',
-        stars: 0,
-        url: 'https://github.com/kevinnngoo/conways_game_of_life',
-        tech: ['Python', 'Terminal'],
-        demo: ''
+        tech: ['Python', 'Flask', 'MongoDB']
       },
       {
         title: 'Microblog',
-    description: 'Full‑featured Flask microblog platform featuring user authentication, profiles, following system, blogging, private messaging, search, translation, notifications, background jobs, REST API and internationalization. Built with Flask, SQLAlchemy, Bootstrap and more.',
-        language: 'Python',
-        stars: 0,
+        status: 'Tutorial-based learning project',
+        description:
+          'A Flask app based on a tutorial that I used to practice common web ' +
+          'application features, including authentication, profiles, posts, ' +
+          'following, and a REST API.',
         url: 'https://github.com/kevinnngoo/microblog',
-        tech: ['Python', 'Flask', 'SQLAlchemy', 'Bootstrap'],
-        demo: 'https://microblog-demo.netlify.app'
+        tech: ['Python', 'Flask', 'SQLAlchemy', 'Bootstrap']
       },
       {
-        title: 'Stock Market Predictor',
-        description: 'Machine learning model that predicts stock market trends using historical price data and technical indicators.',
-        language: 'Python',
-        stars: 0,
-        url: 'https://github.com/kevinnngoo/stock-market-predictor',
-        tech: ['Python', 'scikit-learn', 'Pandas', 'Matplotlib'],
-        demo: ''
+        title: "Conway's Game of Life",
+        status: 'Learning project',
+        description:
+          'A small terminal simulation of Conway’s Game of Life. I built it ' +
+          'to practice Python loops, conditionals, 2D lists, and updating a ' +
+          'grid from one generation to the next.',
+        url: 'https://github.com/kevinnngoo/conways_game_of_life',
+        tech: ['Python', 'Terminal']
       }
     ];
 
-    // Helper to render a list of project objects to the DOM
-    function renderProjects(list) {
-      projectsGrid.innerHTML = '';
-      list.forEach((proj) => {
-        const card = document.createElement('div');
-        card.className = 'project-card';
+    projects.forEach((project) => {
+      const card = document.createElement('article');
+      card.className = 'project-card';
 
-        const iconSVG = getProjectIconSVG(proj.title || proj.name);
+      card.innerHTML = `
+        <div class="project-card__icon project-card__icon--badge" aria-hidden="true">
+          ${getProjectIconSVG(project.title)}
+        </div>
+        <h3>${project.title}</h3>
+        <p class="project-card__status">${project.status}</p>
+        <p>${project.description}</p>
+        <div class="tech-list">
+          ${project.tech
+            .map((technology) => `<span>${technology}</span>`)
+            .join('')}
+        </div>
+        <div class="project-card__links">
+          <a
+            href="${project.url}"
+            class="project-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >View source</a>
+        </div>
+      `;
 
-        const language = proj.language ? ` • ${proj.language}` : '';
-        const stars = typeof proj.stars === 'number' ? proj.stars : 0;
-
-        // Tech badges
-        let techBadges = '';
-        if (proj.tech && proj.tech.length) {
-          techBadges = `<div class="tech-list">${proj.tech.map(t => `<span>${t}</span>`).join('')}</div>`;
-        }
-
-        // Live demo button
-        let demoBtn = '';
-        if (proj.demo && proj.demo.startsWith('http')) {
-          demoBtn = `<a href="${proj.demo}" class="project-link" target="_blank" rel="noopener" style="margin-right:1rem;">Live Demo</a>`;
-        }
-
-        card.innerHTML = `
-          <div class="project-card__icon project-card__icon--badge">
-            ${iconSVG}
-          </div>
-          <h3>${proj.title}</h3>
-          <p>${proj.description}</p>
-          ${techBadges}
-          <div class="project-meta">${stars} ★${language}</div>
-          <div style="display:flex;gap:0.5rem;">
-            ${demoBtn}
-            <a href="${proj.url}" class="project-link" target="_blank" rel="noopener">View on GitHub</a>
-          </div>
-        `;
-
-        projectsGrid.appendChild(card);
-      });
-    }
-
-    // Attempt to fetch real repositories from GitHub. This will work when
-    // running on a domain (e.g. GitHub Pages) where cross‑origin requests to
-    // api.github.com are permitted. If the fetch fails, the fallback list is
-    // rendered.
-    fetch('https://api.github.com/users/kevinnngoo/repos?per_page=100')
-      .then((response) => response.json())
-      .then((repos) => {
-        if (Array.isArray(repos)) {
-          /*
-           * Build a list of repositories to display. Exclude forked
-           * repositories and automation helpers the user doesn’t want shown.
-           * Always include the microblog project (if it exists), then add
-           * the next three highest‑starred repositories. If there are
-           * fewer than four results after filtering, the remainder will be
-           * filled from the fallback list defined above.
-           */
-          const filtered = repos.filter((repo) => {
-            if (repo.fork) return false;
-            const name = repo.name.toLowerCase();
-            // Skip automation helper repos like back‑end automation
-            if (name.includes('back') && name.includes('automation')) return false;
-            return true;
-          });
-          // Find microblog if present
-          // Always include microblog and the stock market predictor if they exist
-          const microblogRepo = filtered.find((repo) => repo.name.toLowerCase() === 'microblog');
-          const stockRepo = filtered.find((repo) => repo.name.toLowerCase().includes('stock'));
-          // Sort the remaining repositories by star count, excluding microblog and stock
-          const sorted = filtered
-            .filter(
-              (repo) =>
-                repo.name.toLowerCase() !== 'microblog' &&
-                !repo.name.toLowerCase().includes('stock')
-            )
-            .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0));
-          // Select up to three top repos (so microblog + stock + 3 = 5 total)
-          const topRepos = sorted.slice(0, 3);
-          // Compose final list starting with microblog then stock
-          const finalList = [];
-          if (microblogRepo) finalList.push(microblogRepo);
-          if (stockRepo) finalList.push(stockRepo);
-          finalList.push(...topRepos);
-          // Map to card objects with image selection
-          const selected = finalList.map((repo) => {
-            let image = '';
-            const name = repo.name.toLowerCase();
-            if (name.includes('fake')) image = './images/projects/fake_news.png';
-            else if (name.includes('apartment')) image = './images/projects/apartment_bot.png';
-            else if (name.includes('conway')) image = './images/projects/game_of_life.png';
-            else if (name.includes('microblog')) image = './images/projects/microblog.png';
-            else if (name.includes('stock')) image = './images/projects/stock_market_predictor.png';
-            else image = './images/projects/expense_tracker.png';
-            // Always use custom description for Microblog and Conway's Game of Life
-            let description = repo.description || '';
-            if (name.includes('microblog')) {
-              description =
-                'Full‑featured Flask microblog platform featuring user authentication, profiles, following system, blogging, private messaging, search, translation, notifications, background jobs, REST API and internationalization. Built with Flask, SQLAlchemy, Bootstrap and more.';
-            }
-            if (name.includes('conway')) {
-              description =
-                "A terminal-based implementation of Conway’s Game of Life written in Python. This project simulates the evolution of cellular patterns using simple rules, random starting states, and an animated display in the terminal. Built as a beginner-friendly project to practice loops, conditionals, and 2D list manipulation for hands-on learning.";
-            }
-            if (!description && name.includes('stock')) {
-              description =
-                'Machine learning model that predicts stock market trends using historical price data and technical indicators.';
-            }
-            if (!description && name.includes('fake')) {
-              description =
-                'Machine learning project that classifies news articles as REAL or FAKE using natural language processing and a PassiveAggressiveClassifier.';
-            }
-            if (!description && name.includes('apartment')) {
-              description =
-                'Python bot that scrapes Boston apartment listings, filters by rent and number of bedrooms, and sends daily email alerts with matching results.';
-            }
-            // Format the repository name into title case for display
-            const formattedTitle = repo.name
-              .replace(/[-_]/g, ' ')
-              .replace(/\b\w/g, (c) => c.toUpperCase());
-            return {
-  title: formattedTitle,
-  description: description || 'No description provided.',
-  language: repo.language || '',
-  stars: repo.stargazers_count || 0,
-  url: repo.html_url
-};
-          });
-          // If there are fewer than five entries, fill from fallbackProjects
-          if (selected.length < 5) {
-            const namesInSelected = selected.map((p) => p.title.toLowerCase());
-            fallbackProjects.forEach((proj) => {
-              if (selected.length >= 5) return;
-              if (!namesInSelected.includes(proj.title.toLowerCase())) {
-                selected.push(proj);
-              }
-            });
-          }
-          renderProjects(selected);
-        } else {
-          renderProjects(fallbackProjects);
-        }
-      })
-      .catch(() => {
-        // If any error occurs (CORS, network, etc.), render fallback projects
-        renderProjects(fallbackProjects);
-      });
+      projectsGrid.appendChild(card);
+    });
   }
 
   // Contact form submission with enhanced validation and user experience
@@ -316,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (formStatus) {
         formStatus.style.color = isError 
           ? getComputedStyle(document.documentElement).getPropertyValue('--error-color')
-          : getComputedStyle(document.documentElement).getPropertyValue('--accent');
+          : getComputedStyle(document.documentElement).getPropertyValue('--accent-light');
         formStatus.textContent = message;
         formStatus.setAttribute('aria-live', 'polite');
       }

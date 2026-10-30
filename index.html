@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kevin Ngo | Software Engineer Portfolio</title>
+    <title>Kevin Ngo | Programmer/Analyst Portfolio</title>
     <meta
       name="description"
-      content="Kevin Ngo is a software engineer specializing in full-stack development with Python, JavaScript, React, and Flask. Computer Science graduate with experience in web development, machine learning, and healthcare technology."
+      content="Kevin Ngo is a Programmer/Analyst at MEDITECH with a background in computer and information sciences and an interest in Python, web development, automation, and AI."
     />
     <meta
       name="keywords"
-      content="Kevin Ngo, Software Engineer, Full Stack Developer, Python, JavaScript, React, Flask, Computer Science, Portfolio, Web Development"
+      content="Kevin Ngo, Programmer/Analyst, MEDITECH, Python, web development, automation, AI, portfolio"
     />
     <meta name="author" content="Kevin Ngo" />
 
@@ -22,11 +22,11 @@
     />
     <meta
       property="og:title"
-      content="Kevin Ngo | Software Engineer Portfolio"
+      content="Kevin Ngo | Programmer/Analyst Portfolio"
     />
     <meta
       property="og:description"
-      content="Kevin Ngo is a software engineer specializing in full-stack development with Python, JavaScript, React, and Flask. Computer Science graduate with experience in web development, machine learning, and healthcare technology."
+      content="Kevin Ngo is a Programmer/Analyst at MEDITECH with a background in computer and information sciences and an interest in Python, web development, automation, and AI."
     />
     <meta
       property="og:image"
@@ -41,11 +41,11 @@
     />
     <meta
       property="twitter:title"
-      content="Kevin Ngo | Software Engineer Portfolio"
+      content="Kevin Ngo | Programmer/Analyst Portfolio"
     />
     <meta
       property="twitter:description"
-      content="Kevin Ngo is a software engineer specializing in full-stack development with Python, JavaScript, React, and Flask. Computer Science graduate with experience in web development, machine learning, and healthcare technology."
+      content="Kevin Ngo is a Programmer/Analyst at MEDITECH with a background in computer and information sciences and an interest in Python, web development, automation, and AI."
     />
     <meta
       property="twitter:image"
@@ -81,8 +81,12 @@
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Kevin Ngo",
-        "jobTitle": "Software Engineer",
-        "description": "Software engineer specializing in full-stack development with Python, JavaScript, React, and Flask",
+        "jobTitle": "Programmer/Analyst",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "MEDITECH"
+        },
+        "description": "Programmer/Analyst at MEDITECH interested in Python, web development, automation, and AI",
         "url": "https://kevinnngoo.github.io/kevin-ngo-website/",
         "image": "https://kevinnngoo.github.io/kevin-ngo-website/images/headshot.png",
         "sameAs": [
@@ -96,11 +100,11 @@
         "knowsAbout": [
           "Python",
           "JavaScript",
-          "React",
           "Flask",
           "PostgreSQL",
-          "Machine Learning",
-          "Web Development"
+          "Web Development",
+          "Automation",
+          "Artificial Intelligence"
         ]
       }
     </script>
@@ -109,17 +113,25 @@
     <!-- Skip navigation for accessibility -->
     <a href="#main-content" class="skip-nav">Skip to main content</a>
 
-    <!-- Mobile menu overlay -->
-    <nav
+    <!-- Mobile navigation drawer -->
+    <div
+      id="mobileMenuBackdrop"
+      class="mobile-menu__backdrop"
+      aria-hidden="true"
+    ></div>
+    <div
       id="mobileMenu"
       class="mobile-menu"
-      role="navigation"
-      aria-label="Mobile navigation menu"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Site navigation"
+      aria-hidden="true"
+      inert
     >
       <div class="mobile-menu__header">
         <img
           src="./images/logo.png"
-          alt="Kevin Ngo logo - Professional software engineer branding"
+          alt="Kevin Ngo personal logo"
           class="mobile-menu__logo"
           loading="lazy"
         />
@@ -132,14 +144,17 @@
         </button>
       </div>
       <!-- search removed -->
-      <ul class="mobile-menu__nav">
-        <li><a href="#education">Education</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#contact">Contact Me</a></li>
-        <li><a href="./resume.pdf" download>Resume</a></li>
-      </ul>
-    </nav>
+      <nav aria-label="Mobile navigation">
+        <ul class="mobile-menu__nav">
+          <li><a href="#about">About</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#technical-focus">Technical Focus</a></li>
+          <li><a href="#education">Education</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="./resume.pdf" download>Resume</a></li>
+        </ul>
+      </nav>
+    </div>
 
     <!-- Header navigation -->
     <header class="header" role="banner">
@@ -147,16 +162,17 @@
         <a href="#" class="header__logo" aria-label="Homepage">
           <img
             src="./images/logo.png"
-            alt="Kevin Ngo logo - Professional software engineer branding"
+            alt="Kevin Ngo personal logo"
             loading="eager"
           />
         </a>
         <nav class="header__nav" role="navigation" aria-label="Main navigation">
           <ul class="header__links">
-            <li><a href="#education">Education</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#projects">Projects</a></li>
-            <li><a href="#contact">Contact Me</a></li>
+            <li><a href="#technical-focus">Technical Focus</a></li>
+            <li><a href="#education">Education</a></li>
+            <li><a href="#contact">Contact</a></li>
             <li class="resume-link">
               <a href="./resume.pdf" download>Resume</a>
             </li>
@@ -167,6 +183,8 @@
           id="openMenu"
           class="header__toggle"
           aria-label="Open navigation menu"
+          aria-controls="mobileMenu"
+          aria-expanded="false"
         >
           <span></span>
           <span></span>
@@ -189,8 +207,7 @@
         <div class="hero__content">
           <div class="hero__text">
             <h1>Kevin Ngo</h1>
-            <!-- Updated tagline to reflect current role -->
-            <p>Software Engineer</p>
+            <p>Programmer/Analyst at MEDITECH</p>
             <div class="hero__icons">
               <a
                 href="https://github.com/kevinnngoo"
@@ -252,151 +269,93 @@
           <div class="hero__image">
             <img
               src="./images/headshot.png"
-              alt="Kevin Ngo - Professional headshot of a software engineer with dark hair, wearing professional attire and smiling"
+              alt="Kevin Ngo smiling in a headshot"
               loading="eager"
             />
           </div>
         </div>
       </section>
 
-      <!-- Expertise section -->
-      <section id="expertise" class="expertise">
+      <!-- About section -->
+      <section id="about" class="about">
         <div class="section__container">
-          <h2>Expertise</h2>
+          <h2>About Me</h2>
+          <p>
+            Hi, I'm Kevin! I'm currently a Programmer/Analyst at MEDITECH, where
+            I work with healthcare software, troubleshoot technical challenges,
+            and develop solutions that support clients and improve system
+            functionality.
+          </p>
+          <p>
+            I graduated Magna Cum Laude from Springfield College with a
+            Bachelor's degree in Computer and Information Sciences and a minor
+            in Business Management. Through my education and professional
+            experience, I've developed a strong foundation in programming,
+            problem-solving, and software development.
+          </p>
+          <p>
+            I'm passionate about continuously improving my skills, exploring
+            new technologies, and applying what I learn to meaningful projects.
+            Whether I'm working on professional assignments or personal
+            projects, I enjoy finding creative and practical solutions to
+            complex problems.
+          </p>
+          <p>
+            Outside of work, I enjoy fitness, reading, gaming, and exploring
+            new interests that help me grow personally and professionally.
+          </p>
+        </div>
+      </section>
+
+      <!-- Projects section -->
+      <section id="projects" class="projects">
+        <div class="section__container">
+          <h2>Selected Projects</h2>
+          <p class="projects__intro">
+            These personal projects are opportunities to practice, experiment,
+            and learn. Each description notes what it does and where it stands.
+          </p>
+          <div id="projectsGrid" class="projects__grid">
+            <!-- Curated project cards are rendered by script.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Technical focus section -->
+      <section id="technical-focus" class="expertise">
+        <div class="section__container">
+          <h2>Technical Focus</h2>
           <div class="expertise__cards">
-            <!-- Card 1 -->
-            <div class="expertise-card">
-              <!-- Atom/technology icon -->
-              <svg
-                class="expertise-card__icon"
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="1.5"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <ellipse
-                  cx="12"
-                  cy="12"
-                  rx="9"
-                  ry="4.5"
-                  transform="rotate(60 12 12)"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <ellipse
-                  cx="12"
-                  cy="12"
-                  rx="9"
-                  ry="4.5"
-                  transform="rotate(-60 12 12)"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <ellipse
-                  cx="12"
-                  cy="12"
-                  rx="9"
-                  ry="4.5"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-              </svg>
-              <h3>Frontend &amp; Backend Development</h3>
+            <article class="expertise-card">
+              <h3>Python</h3>
               <p>
-                I work primarily with Python and JavaScript to build full‑stack
-                applications. I'm comfortable using tools like React, Flask and
-                PostgreSQL to create responsive interfaces and connected backend
-                services.
+                My strongest language. I use it to explore application
+                development, scripting, and data-focused projects.
               </p>
-              <div class="tech-list">
-                <span>React</span><span>JavaScript</span><span>HTML5</span
-                ><span>CSS3</span><span>Flask</span><span>Python</span
-                ><span>SQL</span><span>PostgreSQL</span>
+              <div class="tech-list" aria-label="Python tools">
+                <span>Python</span><span>Flask</span><span>Pandas</span>
               </div>
-            </div>
-            <!-- Card 2 -->
-            <div class="expertise-card">
-              <!-- Container icon -->
-              <svg
-                class="expertise-card__icon"
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x="3"
-                  y="8"
-                  width="18"
-                  height="8"
-                  rx="1"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <path d="M3 12h18" stroke="currentColor" stroke-width="2" />
-                <path d="M7 8v8" stroke="currentColor" stroke-width="2" />
-                <path d="M11 8v8" stroke="currentColor" stroke-width="2" />
-                <path d="M15 8v8" stroke="currentColor" stroke-width="2" />
-              </svg>
-              <h3>Development Tools &amp; Ecosystem</h3>
+            </article>
+            <article class="expertise-card">
+              <h3>Web development</h3>
               <p>
-                I use Git and GitHub daily for version control and I'm familiar
-                with tools like Postman, Linux and VS Code for streamlining the
-                development workflow. I'm also beginning to explore cloud
-                platforms like AWS and container tools like Docker.
+                I enjoy learning how interfaces and backend services work
+                together, and building projects that let me practice both.
               </p>
-              <div class="tech-list">
-                <span>Git</span><span>GitHub Actions</span><span>Docker</span
-                ><span>AWS</span><span>Linux</span><span>Pandas</span>
+              <div class="tech-list" aria-label="Web development tools">
+                <span>JavaScript</span><span>React</span><span>PostgreSQL</span>
               </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="expertise-card">
-              <!-- Python/AI icon -->
-              <svg
-                class="expertise-card__icon"
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 2c-2.21 0-4 1.79-4 4v2h8V6c0-2.21-1.79-4-4-4z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  fill="none"
-                />
-                <path
-                  d="M16 8H8a4 4 0 00-4 4v4c0 2.21 1.79 4 4 4h2v-2a2 2 0 012-2h2a2 2 0 012 2v2h2c2.21 0 4-1.79 4-4v-4a4 4 0 00-4-4z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  fill="none"
-                />
-                <circle cx="9" cy="9" r="0.5" fill="currentColor" />
-                <circle cx="15" cy="15" r="0.5" fill="currentColor" />
-              </svg>
-              <h3>Python &amp; AI Exploration</h3>
+            </article>
+            <article class="expertise-card">
+              <h3>Automation &amp; AI</h3>
               <p>
-                Python is my strongest language. I've used it for scripting,
-                basic automation and learning the fundamentals of AI. I'm
-                currently exploring AI‑related tools to expand my knowledge in
-                this fast‑moving space.
+                I’m interested in practical automation and exploring AI through
+                small, clearly scoped experiments.
               </p>
-              <div class="tech-list">
-                <span>Python</span><span>Pandas</span><span>scikit‑learn</span
-                ><span>Matplotlib</span><span>OpenAI</span>
+              <div class="tech-list" aria-label="Automation and AI tools">
+                <span>Automation</span><span>scikit-learn</span>
               </div>
-            </div>
+            </article>
           </div>
         </div>
       </section>
@@ -406,8 +365,7 @@
         <div class="section__container">
           <h2>Education</h2>
           <div class="education__item">
-            <div class="education__icon">
-              <!-- Graduation cap icon -->
+            <div class="education__icon" aria-hidden="true">
               <svg
                 width="32"
                 height="32"
@@ -427,10 +385,9 @@
                 Bachelor of Science in Computer &amp; Information Sciences
               </h4>
               <p>
+                Graduated Magna Cum Laude with a minor in Business Management.
                 Completed coursework in data structures, database development,
-                operating systems and object‑oriented programming. Developed
-                full‑stack projects using Python, JavaScript and PostgreSQL,
-                graduating magna cum laude with a 3.78 GPA.
+                operating systems, and object-oriented programming.
               </p>
               <p class="education__meta">
                 Sep 2021 – May 2024<br />
@@ -441,45 +398,10 @@
         </div>
       </section>
 
-      <!-- About section -->
-      <section id="about" class="about">
-        <div class="section__container">
-          <h2>About Me</h2>
-          <p>
-            I’m Kevin Ngo, a Springfield College graduate with a degree in
-            Computer and Information Sciences and a minor in Business Management.
-            I’m interested in building useful software and understanding how
-            things work, from the interface someone uses to the data behind it.
-          </p>
-          <p>
-            Python is my strongest language, and I also work with JavaScript,
-            React, Flask and PostgreSQL. I enjoy exploring web development,
-            automation and AI, using personal projects to practice, experiment
-            and keep learning.
-          </p>
-          <p>
-            My background in healthcare and customer service has shaped how I
-            approach problems: listen carefully, pay attention to details and
-            communicate clearly. I bring that same mindset to learning and
-            building software.
-          </p>
-        </div>
-      </section>
-
-      <!-- Projects section -->
-      <section id="projects" class="projects">
-        <div class="section__container">
-          <h2>Projects</h2>
-          <div id="projectsGrid" class="projects__grid">
-            <!-- Project cards will be injected here by script.js -->
-          </div>
-        </div>
-      </section>
-
       <!-- Contact section -->
       <section id="contact" class="contact">
         <div class="section__container">
-          <h2>Contact me!</h2>
+          <h2>Contact</h2>
           <p>
             If you’d like to get in touch, please send me a message using the
             form below.
